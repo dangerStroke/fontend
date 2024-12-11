@@ -22,7 +22,7 @@ import Swiper from '@/views/operationManagement/swiper'
 //供应商管理
 import Supplier from '@/views/operationManagement/supplier'
 //套餐管理
-import SetMenu from '@/views/operationManagement/setMenu'
+import Combo from '@/views/operationManagement/combo'
 //客服
 import CustomerService from '@/views/operationManagement/customerService'
 //关于我们
@@ -113,9 +113,9 @@ export default new Router({
                 requireAuth: true
             }
         }, {
-            path: '/operationManagement/setMenu',
+            path: '/operationManagement/combo',
             name: '套餐管理',
-            component: SetMenu,
+            component: Combo,
             meta: {
                 requireAuth: true
             }

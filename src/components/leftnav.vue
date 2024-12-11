@@ -105,7 +105,7 @@ export default {
               icon: 'icon-cat-skuQuery',
               menuname: '套餐管理',
               hasThird: 'N',
-              url: 'operationManagement/setMenu',
+              url: 'operationManagement/combo',
               menus: null
             },
             {

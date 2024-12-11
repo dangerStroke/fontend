@@ -10,35 +10,53 @@
     </el-breadcrumb>
     <!-- 搜索筛选 -->
     <el-form :inline="true" :model="formInline" class="user-search">
-      <el-form-item label="搜索：">
-        <el-input size="small" v-model="formInline.deptName" placeholder="输入部门名称"></el-input>
+      <el-form-item label="订单号">
+        <el-input size="small" clearable v-model="formInline.orderNo" placeholder="输入序号"></el-input>
       </el-form-item>
-      <el-form-item label="">
-        <el-input size="small" v-model="formInline.deptNo" placeholder="输入部门代码"></el-input>
+      <el-form-item label="联系人">
+        <el-input size="small" clearable v-model="formInline.username" placeholder="输入联系人"></el-input>
+      </el-form-item>
+      <el-form-item label="联系人电话">
+        <el-input size="small" clearable v-model="formInline.telPhone" placeholder="输入联系人电话"></el-input>
+      </el-form-item>
+      <el-form-item label="订单状态">
+        <el-input size="small" clearable v-model="formInline.orderState" placeholder="输入订单状态"></el-input>
       </el-form-item>
       <el-form-item>
         <el-button size="small" type="primary" icon="el-icon-search" @click="search">搜索</el-button>
-        <el-button size="small" type="primary" icon="el-icon-plus" @click="handleEdit()">添加</el-button>
+        <el-button size="small" type="primary" icon="el-icon-refresh" @click="formInline={}">重置</el-button>
+        <!-- <el-button size="small" type="primary" icon="el-icon-plus" @click="handleEdit()">添加</el-button> -->
       </el-form-item>
     </el-form>
     <!--列表-->
-    <el-table size="small" :data="listData" highlight-current-row v-loading="loading" border element-loading-text="拼命加载中" style="width: 100%;">
+    <el-table ref="myTable" size="small" :data="listData" highlight-current-row v-loading="loading" border element-loading-text="拼命加载中" style="width: 100%;">
       <el-table-column align="center" type="selection" width="60">
       </el-table-column>
-      <el-table-column sortable prop="deptName" label="部门名称" width="300">
+      <el-table-column align="center"  prop="orderNo" label="订单号" width="200">
       </el-table-column>
-      <el-table-column sortable prop="deptNo" label="部门代码" width="300">
+      <el-table-column align="center"  prop="orderStateName" label="订单状态" width="80">
       </el-table-column>
-      <el-table-column sortable prop="editTime" label="修改时间" width="300">
-        <template slot-scope="scope">
-          <div>{{scope.row.editTime|timestampToTime}}</div>
-        </template>
+      <el-table-column align="center"  prop="username" label="联系人" width="100">
       </el-table-column>
-      <el-table-column sortable prop="editUser" label="修改人" width="300">
+      <el-table-column align="center"  prop="telPhone" label="联系人电话" width="120">
+      </el-table-column>
+      <el-table-column align="center"  prop="address" label="联系人地址" width="150">
+      </el-table-column>
+      <el-table-column align="center"  prop="" label="备注" width="200">
+      </el-table-column>
+      <el-table-column align="center"  prop="comboName" label="套餐名称" width="150">
+      </el-table-column>
+      <el-table-column align="center"  prop="kickback" label="佣金" width="80">
+      </el-table-column>
+      <el-table-column align="center" prop="orderUsername" label="下单人" width="80">
+      </el-table-column>
+      <el-table-column align="center" prop="" label="下单人电话" width="120">
+      </el-table-column>
+      <el-table-column align="center" prop="createTime" label="创建时间" width="200">
       </el-table-column>
       <el-table-column align="center" label="操作" min-width="300">
         <template slot-scope="scope">
-          <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+          <el-button size="mini" type="info" @click="handleEdit(scope.$index, scope.row)">修改订单状态</el-button>
           <el-button size="mini" type="danger" @click="deleteUser(scope.$index, scope.row)">删除</el-button>
         </template>
       </el-table-column>
@@ -48,11 +66,14 @@
     <!-- 编辑界面 -->
     <el-dialog :title="title" :visible.sync="editFormVisible" width="30%" @click="closeDialog">
       <el-form label-width="120px" :model="editForm" :rules="rules" ref="editForm">
-        <el-form-item label="部门名称" prop="deptName">
-          <el-input size="small" v-model="editForm.deptName" auto-complete="off" placeholder="请输入部门名称"></el-input>
+        <el-form-item label="订单号" prop="orderNo">
+          <el-input size="small" v-model="editForm.orderNo" auto-complete="off" placeholder="请输入序号"></el-input>
         </el-form-item>
-        <el-form-item label="部门代码" prop="deptNo">
-          <el-input size="small" v-model="editForm.deptNo" auto-complete="off" placeholder="请输入部门代码"></el-input>
+        <el-form-item label="用户名称" prop="username">
+          <el-input size="small" v-model="editForm.title" auto-complete="off" placeholder="请输入名称"></el-input>
+        </el-form-item>
+        <el-form-item label="上传图片" prop="telPhone">
+          <el-input size="small" v-model="editForm.telPhone" auto-complete="off" placeholder="请输入名称"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -64,40 +85,40 @@
 </template>
 
 <script>
-import { deptList, deptSave, deptDelete } from '../../api/userMG'
+import { getOrderList} from "../../api/api"
 import Pagination from '../../components/Pagination'
 export default {
   data() {
     return {
+      imgUrl: process.env.VUE_IMG_BASE_URL,
+      baseUrl: process.env.VUE_IMG_BASE_URL,
       nshow: true, //switch开启
       fshow: false, //switch关闭
       loading: false, //是显示加载
       editFormVisible: false, //控制编辑页面显示与隐藏
-      title: '添加',
+      title: '添加轮播图',
       editForm: {
-        deptId: '',
-        deptName: '',
-        deptNo: '',
-        token: localStorage.getItem('logintoken')
+        id:'',
+        orderNo: '',
+        username:'',
+        telPhone:'',
+        orderState:0,
       },
       // rules表单验证
       rules: {
-        deptName: [
-          { required: true, message: '请输入部门名称', trigger: 'blur' }
+        orderNo: [
+          { required: true, message: '请输入序号', trigger: 'blur' }
         ],
-        deptNo: [{ required: true, message: '请输入部门代码', trigger: 'blur' }]
+        title: [{ required: true, message: '请输入名称', trigger: 'blur' }],
+        telPhone: [{ required: true, message: '请上传图片', trigger: 'blur' }]
       },
       formInline: {
-        page: 1,
-        limit: 10,
-        varLable: '',
-        varName: '',
-        token: localStorage.getItem('logintoken')
+        pageNo: 1,
+        pageSize: 10,
       },
       // 删除部门
       seletedata: {
         ids: '',
-        token: localStorage.getItem('logintoken')
       },
       userparm: [], //搜索权限
       listData: [], //用户数据
@@ -131,99 +152,37 @@ export default {
     // 获取公司列表
     getdata(parameter) {
       this.loading = true
-      // 模拟数据开始
-      let res = {
-        code: 0,
-        msg: null,
-        count: 5,
-        data: [
-          {
-            addUser: null,
-            editUser: null,
-            addTime: 1521062371000,
-            editTime: 1526700200000,
-            deptId: 2,
-            deptName: 'XX分公司',
-            deptNo: '1',
-            parentId: 1
-          },
-          {
-            addUser: null,
-            editUser: null,
-            addTime: 1521063247000,
-            editTime: 1526652291000,
-            deptId: 3,
-            deptName: '上海测试',
-            deptNo: '02',
-            parentId: 1
-          },
-          {
-            addUser: null,
-            editUser: null,
-            addTime: 1526349555000,
-            editTime: 1526349565000,
-            deptId: 12,
-            deptName: '1',
-            deptNo: '11',
-            parentId: 1
-          },
-          {
-            addUser: null,
-            editUser: null,
-            addTime: 1526373178000,
-            editTime: 1526373178000,
-            deptId: 13,
-            deptName: '5',
-            deptNo: '5',
-            parentId: 1
-          },
-          {
-            addUser: null,
-            editUser: null,
-            addTime: 1526453107000,
-            editTime: 1526453107000,
-            deptId: 17,
-            deptName: 'v',
-            deptNo: 'v',
-            parentId: 1
-          }
-        ]
-      }
-      this.loading = false
-      this.listData = res.data
-      this.pageparm.currentPage = this.formInline.page
-      this.pageparm.pageSize = this.formInline.limit
-      this.pageparm.total = res.count
       // 模拟数据结束
 
       /***
        * 调用接口，注释上面模拟数据 取消下面注释
        */
-      // deptList(parameter)
-      //   .then(res => {
-      //     this.loading = false
-      //     if (res.success == false) {
-      //       this.$message({
-      //         type: 'info',
-      //         message: res.msg
-      //       })
-      //     } else {
-      //       this.listData = res.data
-      //       // 分页赋值
-      //       this.pageparm.currentPage = this.formInline.page
-      //       this.pageparm.pageSize = this.formInline.limit
-      //       this.pageparm.total = res.count
-      //     }
-      //   })
-      //   .catch(err => {
-      //     this.loading = false
-      //     this.$message.error('菜单加载失败，请稍后再试！')
-      //   })
+       getOrderList(parameter)
+        .then(res => {
+          this.loading = false
+          if (res.success == false) {
+            this.$message({
+              type: 'info',
+              message: res.msg
+            })
+          } else {
+            this.listData = res.data.items
+            // 分页赋值
+            this.pageparm.currentPage = this.formInline.pageNo
+            this.pageparm.pageSize = this.formInline.pageSize
+            this.pageparm.total = res.data.totalNum
+            this.loading = false
+          }
+        })
+        .catch(err => {
+          this.loading = false
+          this.$message.error('菜单加载失败，请稍后再试！')
+        })
     },
     // 分页插件事件
     callFather(parm) {
-      this.formInline.page = parm.currentPage
-      this.formInline.limit = parm.pageSize
+      this.formInline.pageNo = parm.currentPage
+      this.formInline.pageSize = parm.pageSize
       this.getdata(this.formInline)
     },
     // 搜索事件
@@ -234,22 +193,20 @@ export default {
     handleEdit: function(index, row) {
       this.editFormVisible = true
       if (row != undefined && row != 'undefined') {
-        this.title = '修改'
-        this.editForm.deptId = row.deptId
-        this.editForm.deptName = row.deptName
-        this.editForm.deptNo = row.deptNo
-      } else {
-        this.title = '添加'
-        this.editForm.deptId = ''
-        this.editForm.deptName = ''
-        this.editForm.deptNo = ''
+        this.title = '修改订单状态'
+        this.editForm.orderNo = row.orderNo
+        this.editForm.username = row.username
+        this.editForm.telPhone = row.telPhone
+        this.editForm.orderState = row.orderState
+        this.editForm.id = row.id
       }
     },
     // 编辑、增加页面保存方法
     submitForm(editData) {
       this.$refs[editData].validate(valid => {
         if (valid) {
-          deptSave(this.editForm)
+          if(!this.editForm.id) {
+            bannerAdd(this.editForm)
             .then(res => {
               this.editFormVisible = false
               this.loading = false
@@ -257,7 +214,7 @@ export default {
                 this.getdata(this.formInline)
                 this.$message({
                   type: 'success',
-                  message: '公司保存成功！'
+                  message: '上传成功！'
                 })
               } else {
                 this.$message({
@@ -269,52 +226,46 @@ export default {
             .catch(err => {
               this.editFormVisible = false
               this.loading = false
-              this.$message.error('公司保存失败，请稍后再试！')
+              this.$message.error('保存失败，请稍后再试！')
             })
+          }else {
+            bannerUpdate(this.editForm)
+            .then(res => {
+              this.editFormVisible = false
+              this.loading = false
+              if (res.success) {
+                this.getdata(this.formInline)
+                this.$message({
+                  type: 'success',
+                  message: '上传成功！'
+                })
+              } else {
+                this.$message({
+                  type: 'info',
+                  message: res.msg
+                })
+              }
+            })
+            .catch(err => {
+              this.editFormVisible = false
+              this.loading = false
+              this.$message.error('保存失败，请稍后再试！')
+            })
+          }
         } else {
           return false
         }
       })
     },
-    // 删除公司
-    deleteUser(index, row) {
-      this.$confirm('确定要删除吗?', '信息', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(() => {
-          deptDelete(row.deptId)
-            .then(res => {
-              if (res.success) {
-                this.$message({
-                  type: 'success',
-                  message: '公司已删除!'
-                })
-                this.getdata(this.formInline)
-              } else {
-                this.$message({
-                  type: 'info',
-                  message: res.msg
-                })
-              }
-            })
-            .catch(err => {
-              this.loading = false
-              this.$message.error('公司删除失败，请稍后再试！')
-            })
-        })
-        .catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          })
-        })
-    },
     // 关闭编辑、增加弹出框
     closeDialog() {
       this.editFormVisible = false
-    }
+      this.editForm.orderNo = ''
+      this.editForm.username = ''
+      this.editForm.telPhone = ''
+      this.editForm.id = ''
+    },
+    
   }
 }
 </script>
@@ -326,6 +277,31 @@ export default {
 .userRole {
   width: 100%;
 }
+</style>
+<style>
+  .avatar-uploader .el-upload {
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .avatar-uploader .el-upload:hover {
+    border-color: #409EFF;
+  }
+  .avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 178px;
+    height: 178px;
+    line-height: 178px;
+    text-align: center;
+  }
+  .avatar {
+    width: 178px;
+    height: 178px;
+    display: block;
+  }
 </style>
 
  
