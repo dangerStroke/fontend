@@ -122,8 +122,8 @@
         <span style="font-size: 12px;">搜索：</span>
       <el-date-picker
           v-model="dateRange"
-          type="daterange"
-          value-format="yyyy-MM-dd"
+          type="datetimerange"
+          value-format="yyyy-MM-dd HH:mm:ss"
           start-placeholder="开始日期"
           end-placeholder="结束日期"
           :default-time="['00:00:00', '23:59:59']">

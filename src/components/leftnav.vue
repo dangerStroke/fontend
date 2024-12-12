@@ -174,22 +174,31 @@ export default {
             }
           ]
         },
+        
         {
           menuid: 7,
+          icon: 'icon-cat-skuQuery',
+          menuname: '分销管理',
+          hasThird: 'N',
+          url: 'distribution/index',
+          menus: null
+        },
+        {
+          menuid: 8,
           icon: 'li-icon-xitongguanli',
           menuname: '系统设置',
           hasThird: null,
           url: 'setting',
           menus: [
             {
-              menuid: 61,
+              menuid: 81,
               icon: 'icon-cms-manage',
               menuname: '角色管理',
               hasThird: 'N',
               url: 'setting/role',
               menus: null
             }, {
-              menuid: 62,
+              menuid: 82,
               icon: 'icon-news-manage',
               menuname: '用户管理',
               hasThird: 'N',

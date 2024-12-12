@@ -48,10 +48,10 @@
     <el-dialog :title="title" :visible.sync="editFormVisible" width="50%" @click="closeDialog">
       <el-form label-width="150px" :model="editForm" :rules="rules" ref="editForm">
         <el-form-item label="支付宝收款人姓名" prop="alipayUsername">
-          <el-input size="small" v-model="editForm.alipayUsername" auto-complete="off" placeholder="请输入部门名称"></el-input>
+          <el-input size="small" v-model="editForm.alipayUsername" auto-complete="off" placeholder="请输入支付宝收款人姓名"></el-input>
         </el-form-item>
         <el-form-item label="支付宝收款账号" prop="alipayAccount">
-          <el-input size="small" v-model="editForm.deptNo" auto-complete="off" placeholder="请输入部门代码"></el-input>
+          <el-input size="small" v-model="editForm.alipayAccount" auto-complete="off" placeholder="请输入支付宝收款账号"></el-input>
         </el-form-item>
         <el-form-item label="支付宝收款码" prop="alipayPaymentCode">
           <el-upload
@@ -65,10 +65,10 @@
           </el-upload>
         </el-form-item>
         <el-form-item label="微信收款人姓名" prop="weChatUsername">
-          <el-input size="small" v-model="editForm.alipayUsername" auto-complete="off" placeholder="请输入部门名称"></el-input>
+          <el-input size="small" v-model="editForm.weChatUsername" auto-complete="off" placeholder="请输入微信收款人姓名"></el-input>
         </el-form-item>
         <el-form-item label="微信收款账号" prop="weChatAccount">
-          <el-input size="small" v-model="editForm.deptNo" auto-complete="off" placeholder="请输入部门代码"></el-input>
+          <el-input size="small" v-model="editForm.weChatAccount" auto-complete="off" placeholder="请输入微信收款账号"></el-input>
         </el-form-item>
         <el-form-item label="微信收款码" prop="weChatPaymentCode">
           <el-upload
@@ -214,7 +214,7 @@ export default {
                 this.getdata(this.formInline)
                 this.$message({
                   type: 'success',
-                  message: '公司保存成功！'
+                  message: '保存成功！'
                 })
               } else {
                 this.$message({
@@ -226,7 +226,7 @@ export default {
             .catch(err => {
               this.editFormVisible = false
               this.loading = false
-              this.$message.error('公司保存失败，请稍后再试！')
+              this.$message.error('保存失败，请稍后再试！')
             })
         } else {
           return false
@@ -239,17 +239,17 @@ export default {
     },
      //上传图片
     apHandleOnSuccess(e) {
-      this.editForm.picUrl = e.data
+      this.editForm.alipayPaymentCode = e.data
     },
     apHandleRemove() {
-      this.editForm.picUrl = ""
+      this.editForm.alipayPaymentCode = ""
     },
     //上传图片
     wxHandleOnSuccess(e) {
-      this.editForm.picUrl = e.data
+      this.editForm.weChatPaymentCode = e.data
     },
     wxHandleRemove() {
-      this.editForm.picUrl = ""
+      this.editForm.weChatPaymentCode = ""
     }
   }
 }

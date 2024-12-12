@@ -45,6 +45,8 @@ import User from '@/views/setting/user'
 //获取公司信息
 import Company from '@/views/companyInfo/index'
 
+//分销管理
+import Distribution from '@/views/distribution/index'
 
 
 // 启用路由
@@ -182,6 +184,13 @@ export default new Router({
             path: '/setting/user',
             name: '系统用户管理',
             component: User,
+            meta: {
+                requireAuth: true
+            }
+        },{
+            path: '/distribution/index',
+            name: '分销管理',
+            component: Distribution,
             meta: {
                 requireAuth: true
             }
