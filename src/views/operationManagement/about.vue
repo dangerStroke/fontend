@@ -8,24 +8,6 @@
       <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>关于我们</el-breadcrumb-item>
     </el-breadcrumb>
-    <!-- 搜索筛选 -->
-    <!-- <el-form :inline="true" :model="formInline" class="user-search">
-      <el-form-item label="客服状态">
-        <el-select clearable v-model="formInline.status" placeholder="请选择订单状态">
-          <el-option
-            v-for="item in statusOption"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value">
-          </el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item>
-        <el-button size="small" type="primary" icon="el-icon-search" @click="search">搜索</el-button>
-        <el-button size="small" type="primary" icon="el-icon-refresh" @click="refresh">重置</el-button>
-        <el-button size="small" type="primary" icon="el-icon-plus" @click="handleEdit()">添加</el-button>
-      </el-form-item>
-    </el-form> -->
     <!--列表-->
     <el-table ref="myTable" size="small" :data="listData" highlight-current-row v-loading="loading" border element-loading-text="拼命加载中" style="width: 100%;">
       <el-table-column align="center" type="selection" width="60">
@@ -91,7 +73,7 @@
 </template>
 
 <script>
-import { getWaiterPage, waiterAdd, waiterDisable, waiterEnable, waiterUpdate } from "../../api/api"
+import { getAboutUs, updateAboutUs } from "../../api/api"
 import Pagination from '../../components/Pagination'
 export default {
   data() {
@@ -172,7 +154,7 @@ export default {
       /***
        * 调用接口，注释上面模拟数据 取消下面注释
        */
-       getWaiterPage(parameter)
+       getAboutUs(parameter)
         .then(res => {
           this.loading = false
           if (res.success == false) {
@@ -232,8 +214,7 @@ export default {
     submitForm(editData) {
       this.$refs[editData].validate(valid => {
         if (valid) {
-          if(!this.editForm.id) {
-            waiterAdd(this.editForm)
+          updateAboutUs(this.editForm)
             .then(res => {
               this.editFormVisible = false
               this.loading = false
@@ -255,30 +236,6 @@ export default {
               this.loading = false
               this.$message.error('保存失败，请稍后再试！')
             })
-          }else {
-            waiterUpdate(this.editForm)
-            .then(res => {
-              this.editFormVisible = false
-              this.loading = false
-              if (res.success) {
-                this.getdata(this.formInline)
-                this.$message({
-                  type: 'success',
-                  message: '上传成功！'
-                })
-              } else {
-                this.$message({
-                  type: 'info',
-                  message: res.msg
-                })
-              }
-            })
-            .catch(err => {
-              this.editFormVisible = false
-              this.loading = false
-              this.$message.error('保存失败，请稍后再试！')
-            })
-          }
         } else {
           return false
         }
@@ -326,25 +283,6 @@ export default {
       this.editForm.username = ''
       this.editForm.weChatQrCode = ''
       this.editForm.id = ''
-    },
-    //启用禁用
-    handleActive: function(index, row) {
-      //启用
-      if(row.status == -1) {
-        waiterEnable({id:row.id}).then(res => {
-          if(res.code == 200) {
-            this.listData[index].status = 1
-            this.$refs.myTable.doLayout();
-          }
-        })
-      }else{
-        waiterDisable({id:row.id}).then(res => {
-          if(res.code == 200) {
-            this.listData[index].status = -1
-            this.$refs.myTable.doLayout();
-          }
-        })
-      }
     },
     //上传图片
     handleOnSuccess(e) {

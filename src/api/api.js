@@ -74,3 +74,18 @@ export const getApplyList = (params) => { return req("post", "/broadband/manage/
 export const applyApprove = (params) => { return req("post", "/broadband/manage/withdrawal/approve", params) };
 //拒绝提现
 export const applyReject= (params) => { return req("post", "/broadband/manage/withdrawal/reject", params) };
+
+//获取关于我们
+export const getAboutUs = (params) => { return req("GET", "/broadband/manage/company/aboutUs", params) };
+//修改关于我们
+export const updateAboutUs = (params) => { return req("post", "/broadband/manage/company/updateAboutUs", params) };
+
+//获取公告
+export const getNotice= (params) => { return req("GET", "/broadband/manage/company/notice", params) };
+//修改公共
+export const updateNotice = (params) => { return req("POST", "/broadband/manage/company/updateNotice", params) };
+
+//获取收款账户
+export const getPayment = (params) => { return req("GET", "/broadband/manage/company/aboutPayment", params) };
+//修改收款账户
+export const updatePayment = (params) => { return req("POST", "/broadband/manage/company/updatePayment", params) };

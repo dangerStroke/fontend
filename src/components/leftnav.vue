@@ -137,7 +137,7 @@ export default {
               icon: 'icon-cat-skuQuery',
               menuname: '收款账号设置',
               hasThird: 'N',
-              url: 'operationManagement/number',
+              url: 'operationManagement/payment',
               menus: null
             }
           ]

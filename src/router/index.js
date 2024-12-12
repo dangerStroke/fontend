@@ -30,7 +30,7 @@ import About from '@/views/operationManagement/about'
 //公告
 import Notice from '@/views/operationManagement/notice'
 //收款账号设置
-import Number from '@/views/operationManagement/number'
+import Payment from '@/views/operationManagement/payment'
 
 //提现申请
 import Apply from '@/views/moneyManagement/apply'
@@ -141,9 +141,9 @@ export default new Router({
                 requireAuth: true
             }
         }, {
-            path: '/operationManagement/number',
+            path: '/operationManagement/Payment',
             name: '收款账号设置',
-            component: Number,
+            component: Payment,
             meta: {
                 requireAuth: true
             }
