@@ -119,13 +119,21 @@ export default {
             {
               menuid: 55,
               icon: 'icon-cat-skuQuery',
+              menuname: '公司信息管理',
+              hasThird: 'N',
+              url: 'companyInfo/about',
+              menus: null
+            },
+            {
+              menuid: 56,
+              icon: 'icon-cat-skuQuery',
               menuname: '关于我们',
               hasThird: 'N',
               url: 'operationManagement/about',
               menus: null
             },
             {
-              menuid: 56,
+              menuid: 57,
               icon: 'icon-cat-skuQuery',
               menuname: '公告',
               hasThird: 'N',
@@ -133,7 +141,7 @@ export default {
               menus: null
             },
             {
-              menuid: 57,
+              menuid: 58,
               icon: 'icon-cat-skuQuery',
               menuname: '收款账号设置',
               hasThird: 'N',

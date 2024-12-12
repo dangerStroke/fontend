@@ -42,6 +42,9 @@ import Role from '@/views/setting/role'
 //用户管理
 import User from '@/views/setting/user'
 
+//获取公司信息
+import Company from '@/views/companyInfo/index'
+
 
 
 // 启用路由
@@ -123,6 +126,13 @@ export default new Router({
             path: '/operationManagement/customerService',
             name: '客服管理',
             component: CustomerService,
+            meta: {
+                requireAuth: true
+            }
+        }, {
+            path: '/companyInfo/about',
+            name: '公司信息管理',
+            component: Company,
             meta: {
                 requireAuth: true
             }

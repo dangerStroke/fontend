@@ -9,6 +9,10 @@ export const getComboList = (params) => { return req("post", "/broadband/manage/
 export const handleDisable = (params) => { return req("GET", "/broadband/manage/combo/disable?id="+params.id, params) };
 //套餐禁用
 export const handleEnable = (params) => { return req("GET", "/broadband/manage/combo/enable?id="+params.id, params) };
+//添加套餐列表
+export const comboAdd = (params) => { return req("post", "/broadband/manage/combo/add", params) };
+//修改套餐列表
+export const comboUpdate = (params) => { return req("post", "/broadband/manage/combo/update", params) };
 
 //获取轮播图列表
 export const getSwiperList = (params) => { return req("post", "/broadband/manage/banner/page", params) };

@@ -31,8 +31,6 @@
     </el-form>
     <!--列表-->
     <el-table ref="myTable" size="small" :data="listData" highlight-current-row v-loading="loading" border element-loading-text="拼命加载中" style="width: 100%;">
-      <el-table-column align="center" type="selection" width="60">
-      </el-table-column>
       <el-table-column align="center" prop="comboName" label="套餐名称" width="100">
       </el-table-column>
       <el-table-column align="center" prop="comboType" label="套餐类型" width="100">
@@ -60,15 +58,13 @@
       </el-table-column>
       <el-table-column align="center" sortable prop="shareKickback" label="分佣" width="100">
       </el-table-column>
-      <el-table-column align="center" sortable prop="vipKickback" label="会员佣金" width="100">
-      </el-table-column>
       <el-table-column align="center"  prop="status" label="状态" width="100">
         <template slot-scope="scope">
           <span v-if="scope.row.status == 1">启用</span>
           <span v-if="scope.row.status == -1">草稿</span>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="操作" min-width="300">
+      <el-table-column align="center" label="操作" min-width="200">
         <template slot-scope="scope">
           <el-button size="mini" type="info" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
           <el-button size="mini" type="primary" @click="handleActive(scope.$index, scope.row, )" v-if="scope.row.status == -1">启用</el-button>
@@ -82,11 +78,31 @@
     <!-- 编辑界面 -->
     <el-dialog :title="title" :visible.sync="editFormVisible" width="60%" @click="closeDialog">
       <el-form label-width="120px" :model="editForm" :rules="rules" ref="editForm">
-            <el-form-item label="部门名称" prop="deptName">
-              <el-input size="small" v-model="editForm.deptName" auto-complete="off" placeholder="请输入部门名称"></el-input>
+            <el-form-item label="套餐名称" prop="comboName">
+              <el-input size="small" v-model="editForm.comboName" auto-complete="off" placeholder="请输入套餐名称"></el-input>
             </el-form-item>
-            <el-form-item label="部门代码" prop="deptNo">
-              <el-input size="small" v-model="editForm.deptNo" auto-complete="off" placeholder="请输入部门代码"></el-input>
+            <el-form-item label="套餐图片" prop="comboUrl">
+              <el-upload
+                class="avatar-uploader"
+                :action="baseUrl+'/broadband/common/file/uploadImage'"
+                :show-file-list="false"
+                :on-success="handleOnSuccess"
+                :on-remove="handleRemove">
+                <img v-if="editForm.comboUrl" :src="imgUrl+editForm.comboUrl" class="avatar">
+                <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+              </el-upload>
+            </el-form-item>
+            <el-form-item label="套餐详情介绍" prop="comboDescr">
+              <el-input size="small" v-model="editForm.comboDescr" auto-complete="off" placeholder="请输入套餐详情介绍"></el-input>
+            </el-form-item>
+            <el-form-item label="套餐买点" prop="sellingPoint">
+              <el-input size="small" v-model="editForm.sellingPoint" auto-complete="off" placeholder="请输入套餐买点"></el-input>
+            </el-form-item>
+            <el-form-item label="佣金" prop="kickback">
+              <el-input size="small" v-model="editForm.kickback" auto-complete="off" placeholder="请输入佣金"></el-input>
+            </el-form-item>
+            <el-form-item label="一级分销金额" prop="shareKickback">
+              <el-input size="small" v-model="editForm.shareKickback" auto-complete="off" placeholder="请输入一级分销金额"></el-input>
             </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -99,29 +115,34 @@
 
 <script>
 
-import { deptList, deptSave, deptDelete } from '../../api/userMG'
-import { getComboList, handleDisable, handleEnable } from '../../api/api'
+import { getComboList, handleDisable, handleEnable, comboAdd, comboUpdate } from '../../api/api'
 import Pagination from '../../components/Pagination'
 export default {
   data() {
     return {
       imgUrl: process.env.VUE_IMG_BASE_URL,
-      nshow: true, //switch开启
-      fshow: false, //switch关闭
+      baseUrl: process.env.VUE_IMG_BASE_URL,
       loading: false, //是显示加载
       editFormVisible: false, //控制编辑页面显示与隐藏
       title: '添加',
       editForm: {
-        deptId: '',
-        deptName: '',
-        deptNo: '',
+        comboName: '',
+        comboUrl: '',
+        comboDescr:'',
+        sellingPoint:'',
+        kickback:'',
+        shareKickback:''
       },
       // rules表单验证
       rules: {
-        deptName: [
-          { required: true, message: '请输入部门名称', trigger: 'blur' }
+        comboName: [
+          { required: true, message: '请输入套餐名称', trigger: 'blur' }
         ],
-        deptNo: [{ required: true, message: '请输入部门代码', trigger: 'blur' }]
+        comboUrl: [{ required: true, message: '请上传套餐图片', trigger: 'blur' }],
+        comboDescr: [{ required: true, message: '请输入套餐描述', trigger: 'blur' }],
+        sellingPoint: [{ required: true, message: '请输入套餐买点', trigger: 'blur' }],
+        kickback: [{ required: true, message: '请输入套餐佣金', trigger: 'blur' }],
+        shareKickback: [{ required: true, message: '请输入一级分销金额', trigger: 'blur' }],
       },
       formInline: {
         pageNo: 1,
@@ -220,22 +241,30 @@ export default {
     handleEdit: function(index, row) {
       this.editFormVisible = true
       if (row != undefined && row != 'undefined') {
-        this.title = '修改'
-        this.editForm.deptId = row.deptId
-        this.editForm.deptName = row.deptName
-        this.editForm.deptNo = row.deptNo
+        this.title = '修改套餐'
+        this.editForm.id = row.id
+        this.editForm.comboName = row.comboName
+        this.editForm.comboUrl = row.comboUrl
+        this.editForm.comboDescr = row.comboDescr
+        this.editForm.sellingPoint = row.sellingPoint
+        this.editForm.kickback = row.kickback
+        this.editForm.shareKickback = row.shareKickback
       } else {
-        this.title = '添加'
-        this.editForm.deptId = ''
-        this.editForm.deptName = ''
-        this.editForm.deptNo = ''
+        this.title = '添加套餐'
+        this.editForm.comboName = ''
+        this.editForm.comboUrl = ''
+        this.editForm.comboDescr = ''
+        this.editForm.sellingPoint = ''
+        this.editForm.kickback = ''
+        this.editForm.shareKickback = ''
       }
     },
     // 编辑、增加页面保存方法
     submitForm(editData) {
       this.$refs[editData].validate(valid => {
         if (valid) {
-          deptSave(this.editForm)
+         if(this.editForm.id) {
+          comboUpdate(this.editForm)
             .then(res => {
               this.editFormVisible = false
               this.loading = false
@@ -257,6 +286,30 @@ export default {
               this.loading = false
               this.$message.error('公司保存失败，请稍后再试！')
             })
+         }else {
+          comboAdd(this.editForm)
+            .then(res => {
+              this.editFormVisible = false
+              this.loading = false
+              if (res.success) {
+                this.getdata(this.formInline)
+                this.$message({
+                  type: 'success',
+                  message: '公司保存成功！'
+                })
+              } else {
+                this.$message({
+                  type: 'info',
+                  message: res.msg
+                })
+              }
+            })
+            .catch(err => {
+              this.editFormVisible = false
+              this.loading = false
+              this.$message.error('公司保存失败，请稍后再试！')
+            })
+         }
         } else {
           return false
         }
@@ -299,6 +352,13 @@ export default {
     },
     // 关闭编辑、增加弹出框
     closeDialog() {
+      this.editForm.id = ''
+      this.editForm.comboName = ''
+      this.editForm.comboUrl = ''
+      this.editForm.comboDescr = ''
+      this.editForm.sellingPoint = ''
+      this.editForm.kickback = ''
+      this.editForm.shareKickback = ''
       this.editFormVisible = false
     },
     //启用禁用
@@ -319,6 +379,13 @@ export default {
           }
         })
       }
+    },
+    //上传图片
+    handleOnSuccess(e) {
+      this.editForm.comboUrl=e.data
+    },
+    handleRemove() {
+      this.editForm.comboUrl = ""
     }
   }
 }
@@ -332,6 +399,30 @@ export default {
   width: 100%;
 }
 </style>
-
+<style>
+  .avatar-uploader .el-upload {
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .avatar-uploader .el-upload:hover {
+    border-color: #409EFF;
+  }
+  .avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 178px;
+    height: 178px;
+    line-height: 178px;
+    text-align: center;
+  }
+  .avatar {
+    width: 178px;
+    height: 178px;
+    display: block;
+  }
+</style>
  
  
