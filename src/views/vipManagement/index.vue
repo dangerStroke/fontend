@@ -26,6 +26,17 @@
           </el-option>
         </el-select>
       </el-form-item>
+      <el-form-item label="申请时间">
+        <el-date-picker
+          clearable
+          v-model="formInline.applyTime"
+          type="daterange"
+          value-format="yyyy-MM-dd"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+          :default-time="['00:00:00', '23:59:59']">
+        </el-date-picker>
+      </el-form-item>
       <el-form-item>
         <el-button size="small" type="primary" icon="el-icon-search" @click="search">搜索</el-button>
         <el-button size="small" type="primary" icon="el-icon-refresh" @click="refresh">重置</el-button>
@@ -112,7 +123,7 @@ export default {
         pageNo: 1,
         pageSize: 10,
         status: '',
-        username: '',
+        applyTime: '',
         phone: '',
       },
       // 删除部门
@@ -179,6 +190,8 @@ export default {
       /***
        * 调用接口，注释上面模拟数据 取消下面注释
        */
+       parameter.startTime = parameter.applyTime[0]
+       parameter.endTime = parameter.applyTime[1]
        getVipList(parameter)
         .then(res => {
           this.loading = false
@@ -211,7 +224,7 @@ export default {
       this.getdata(this.formInline)
     },
     refresh() {
-      this.formInline.username = ''
+      this.formInline.applyTime = ''
       this.formInline.phone =  ''
       this.formInline.status = ""
     },  

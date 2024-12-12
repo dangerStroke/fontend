@@ -214,6 +214,7 @@ export default {
     submitForm(editData) {
       this.$refs[editData].validate(valid => {
         if (valid) {
+          this.editForm.orderNum = Number(this.editForm.orderNum)
           if(!this.editForm.id) {
             bannerAdd(this.editForm)
             .then(res => {

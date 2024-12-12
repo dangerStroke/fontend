@@ -50,7 +50,7 @@ export const userEnable = (params) => { return req("get", "/broadband/manage/cli
 //修改客户端用户VIP到期时间
 export const userUpdateVip = (params) => { return req("post", "/broadband/manage/client/user/updateVipExpirationTime", params) };
 //修改客户端用户信息
-export const userInfoUpdate = (params) => { return req("post", "/broadband/manage/client/user/updateUserlnfo", params) };
+export const userInfoUpdate = (params) => { return req("post", "/broadband/manage/client/user/updateUserInfo", params) };
 
 //获取供应商列表
 export const getSupplierList = (params) => { return req("post", "/broadband/manage/supplier/page", params) };
@@ -93,3 +93,9 @@ export const updateNotice = (params) => { return req("POST", "/broadband/manage/
 export const getPayment = (params) => { return req("GET", "/broadband/manage/company/aboutPayment", params) };
 //修改收款账户
 export const updatePayment = (params) => { return req("POST", "/broadband/manage/company/updatePayment", params) };
+
+//获取数据分析
+export const getAnalysisCount = () => { return req("GET", "/broadband/manage/analysis/count") };
+export const getAnalysisCountQuery = (params) => { return req("POST", "/broadband/manage/analysis/query",params) };
+
+//

@@ -11,13 +11,14 @@
     <!-- 搜索筛选 -->
     <el-form :inline="true" :model="formInline" class="user-search">
       <el-form-item label="用户名称">
-        <el-input size="small" v-model="formInline.username" placeholder="输入用户名称"></el-input>
+        <el-input size="small" clearable v-model="formInline.username" placeholder="输入用户名称"></el-input>
       </el-form-item>
       <el-form-item label="手机号">
-        <el-input size="small" v-model="formInline.phone" placeholder="输入手机号码"></el-input>
+        <el-input size="small" clearable v-model="formInline.phone" placeholder="输入手机号码"></el-input>
       </el-form-item>
       <el-form-item label="会员到期时间">
         <el-date-picker
+          clearable
           v-model="formInline.vipExpirationTime"
           type="daterange"
           value-format="yyyy-MM-dd"
@@ -28,6 +29,7 @@
       </el-form-item>
       <el-form-item label="创建时间">
         <el-date-picker
+        clearable
           v-model="formInline.createTime"
           type="daterange"
           value-format="yyyy-MM-dd"
@@ -91,7 +93,7 @@
           <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
           <el-button size="mini" type="primary" @click="handleActive(scope.$index, scope.row, )" v-if="scope.row.state == -1">启用</el-button>
           <el-button size="mini" type="warning" @click="handleActive(scope.$index, scope.row)" v-if="scope.row.state == 0">禁用</el-button>
-          <el-button size="mini" type="danger" @click="deleteUser(scope.$index, scope.row)">删除</el-button>
+          <!-- <el-button size="mini" type="danger" @click="deleteUser(scope.$index, scope.row)">删除</el-button> -->
         </template>
       </el-table-column>
     </el-table>
@@ -278,7 +280,7 @@ export default {
     submitForm(editData) {
       this.$refs[editData].validate(valid => {
         if (valid) {
-          if(editData.userId) {
+          if(this.editForm.userId) {
             userUpdateVip(this.editForm)
             .then(res => {
               this.editFormVisible = false
@@ -287,7 +289,7 @@ export default {
                 this.getdata(this.formInline)
                 this.$message({
                   type: 'success',
-                  message: '公司保存成功！'
+                  message: '保存成功！'
                 })
               } else {
                 this.$message({
@@ -299,7 +301,7 @@ export default {
             .catch(err => {
               this.editFormVisible = false
               this.loading = false
-              this.$message.error('公司保存失败，请稍后再试！')
+              this.$message.error('保存失败，请稍后再试！')
             })
             userInfoUpdate(this.editForm)
             .then(res => {

@@ -23,6 +23,16 @@
           </el-option>
         </el-select>
       </el-form-item>
+      <el-form-item label="套餐状态：">
+        <el-select clearable v-model="formInline.status" placeholder="请选择订单状态">
+          <el-option
+            v-for="item in statusOption"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
+          </el-option>
+        </el-select>
+      </el-form-item>
       <el-form-item>
         <el-button size="small" type="primary" icon="el-icon-search" @click="search">搜索</el-button>
         <el-button size="small" type="primary" icon="el-icon-refresh" @click="refresh">重置</el-button>
@@ -50,6 +60,10 @@
       </el-table-column>
       <el-table-column align="center" prop="createUser" label="创建人" width="100">
       </el-table-column>
+      <el-table-column align="center" prop="comboDescr" label="套餐描述" width="100">
+      </el-table-column>
+      <el-table-column align="center" prop="sellingPoint" label="套餐买点" width="100">
+      </el-table-column>
       <el-table-column align="center" prop="supplierName" label="供应商名称" width="120">
       </el-table-column>
       <el-table-column align="center" sortable prop="kickback" label="佣金" width="100">
@@ -61,15 +75,16 @@
       <el-table-column align="center"  prop="status" label="状态" width="100">
         <template slot-scope="scope">
           <span v-if="scope.row.status == 1">启用</span>
-          <span v-if="scope.row.status == -1">草稿</span>
+          <span v-if="scope.row.status == 0">草稿</span>
+          <span v-if="scope.row.status == -1">禁用</span>
         </template>
       </el-table-column>
       <el-table-column align="center" label="操作" min-width="200">
         <template slot-scope="scope">
           <el-button size="mini" type="info" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-          <el-button size="mini" type="primary" @click="handleActive(scope.$index, scope.row, )" v-if="scope.row.status == -1">启用</el-button>
-          <el-button size="mini" type="warning" @click="handleActive(scope.$index, scope.row)" v-if="scope.row.status == 1">禁用</el-button>
-          <!-- <el-button size="mini" type="danger" @click="deleteUser(scope.$index, scope.row)">删除</el-button> -->
+          <el-button size="mini" type="primary" @click="handleActive(scope.$index, scope.row)" v-if="scope.row.status == 0 || scope.row.status == -1">启用</el-button>
+          <el-button size="mini" type="warning" @click="handleActive(scope.$index, scope.row)" v-if="scope.row.status == 1 ">禁用</el-button>
+          <el-button size="mini" type="warning" @click="handleDraft(scope.$index, scope.row)" v-if="scope.row.status == -1 ">存为草稿</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -98,11 +113,34 @@
             <el-form-item label="套餐买点" prop="sellingPoint">
               <el-input size="small" v-model="editForm.sellingPoint" auto-complete="off" placeholder="请输入套餐买点"></el-input>
             </el-form-item>
+            <el-form-item label="供应商" prop="supplierCode">
+            <el-select clearable v-model="editForm.supplierCode" placeholder="请选择供应商">
+                <el-option
+                  v-for="item in supplierOption"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
+            </el-form-item>
             <el-form-item label="佣金" prop="kickback">
               <el-input size="small" v-model="editForm.kickback" auto-complete="off" placeholder="请输入佣金"></el-input>
             </el-form-item>
+            <el-form-item label="vip佣金" prop="vipKickback">
+              <el-input size="small" v-model="editForm.vipKickback" auto-complete="off" placeholder="请输入一级分销金额"></el-input>
+            </el-form-item>
             <el-form-item label="一级分销金额" prop="shareKickback">
               <el-input size="small" v-model="editForm.shareKickback" auto-complete="off" placeholder="请输入一级分销金额"></el-input>
+            </el-form-item>
+            <el-form-item label="套餐类型：" prop="comboType">
+              <el-select clearable v-model="editForm.comboType" placeholder="请选择套餐类型">
+                <el-option
+                  v-for="item in typeList"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
             </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -120,6 +158,20 @@ import Pagination from '../../components/Pagination'
 export default {
   data() {
     return {
+      supplierOption:[
+        {
+          value:'CUCC',
+          label:'中国联通'
+        },
+        {
+          value:'CMCC',
+          label:'中国移动'
+        },
+        {
+          value:'CTCC',
+          label:'中国电信'
+        },
+      ],
       imgUrl: process.env.VUE_IMG_BASE_URL,
       baseUrl: process.env.VUE_IMG_BASE_URL,
       loading: false, //是显示加载
@@ -131,7 +183,11 @@ export default {
         comboDescr:'',
         sellingPoint:'',
         kickback:'',
-        shareKickback:''
+        shareKickback:'',
+        comboType:'',
+        status:-1,
+        supplierCode:'',
+        vipKickback:''
       },
       // rules表单验证
       rules: {
@@ -143,6 +199,9 @@ export default {
         sellingPoint: [{ required: true, message: '请输入套餐买点', trigger: 'blur' }],
         kickback: [{ required: true, message: '请输入套餐佣金', trigger: 'blur' }],
         shareKickback: [{ required: true, message: '请输入一级分销金额', trigger: 'blur' }],
+        vipKickback: [{ required: true, message: '请输入vip佣金', trigger: 'blur' }],
+        comboType: [{ required: true, message: '请选择套餐类型', trigger: 'blur' }],
+        supplierCode: [{ required: true, message: '请选择供应商', trigger: 'blur' }],
       },
       formInline: {
         pageNo: 1,
@@ -165,11 +224,25 @@ export default {
       typeList:[
         {
           label:'单宽带',
-          value:'-1',
+          value: 1,
         },
         {
           label:'融合套餐',
-          value:'1',
+          value:0,
+        }
+      ],
+      statusOption:[
+        {
+          label:'启用',
+          value: 1,
+        },
+        {
+          label:'草稿',
+          value:0,
+        },
+        {
+          label:'禁用',
+          value: -1,
         }
       ]
     }
@@ -249,6 +322,10 @@ export default {
         this.editForm.sellingPoint = row.sellingPoint
         this.editForm.kickback = row.kickback
         this.editForm.shareKickback = row.shareKickback
+        this.editForm.comboType = row.comboType
+        this.editForm.vipKickback = row.vipKickback
+        this.editForm.supplierCode = row.supplierCode
+        
       } else {
         this.title = '添加套餐'
         this.editForm.comboName = ''
@@ -257,12 +334,20 @@ export default {
         this.editForm.sellingPoint = ''
         this.editForm.kickback = ''
         this.editForm.shareKickback = ''
+        this.editForm.comboType = ''
+        this.editForm.vipKickback = ''
+        this.editForm.supplierCode = ''
       }
     },
     // 编辑、增加页面保存方法
     submitForm(editData) {
       this.$refs[editData].validate(valid => {
         if (valid) {
+          this.supplierOption.map(res => {
+            if(res.value == this.editForm.supplierCode) {
+              this.editForm.supplierName = res.label
+            }
+          })
          if(this.editForm.id) {
           comboUpdate(this.editForm)
             .then(res => {
@@ -315,41 +400,7 @@ export default {
         }
       })
     },
-    // 删除公司
-    deleteUser(index, row) {
-      this.$confirm('确定要删除吗?', '信息', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(() => {
-          deptDelete(row.deptId)
-            .then(res => {
-              if (res.success) {
-                this.$message({
-                  type: 'success',
-                  message: '公司已删除!'
-                })
-                this.getdata(this.formInline)
-              } else {
-                this.$message({
-                  type: 'info',
-                  message: res.msg
-                })
-              }
-            })
-            .catch(err => {
-              this.loading = false
-              this.$message.error('公司删除失败，请稍后再试！')
-            })
-        })
-        .catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          })
-        })
-    },
+
     // 关闭编辑、增加弹出框
     closeDialog() {
       this.editForm.id = ''
@@ -364,14 +415,14 @@ export default {
     //启用禁用
     handleActive: function(index, row) {
       //启用
-      if(row.status == -1) {
+      if(row.status == -1 || row.status == 0) {
         handleEnable({id:row.id}).then(res => {
           if(res.code == 200) {
             this.listData[index].status = 1
             this.$refs.myTable.doLayout();
           }
         })
-      }else{
+      }else if(row.status == 1){
         handleDisable({id:row.id}).then(res => {
           if(res.code == 200) {
             this.listData[index].status = -1
@@ -379,6 +430,32 @@ export default {
           }
         })
       }
+    },
+    //存为草稿
+    handleDraft(index, row) {
+      comboUpdate({id:row.id, status:0})
+            .then(res => {
+              this.editFormVisible = false
+              this.loading = false
+              if (res.success) {
+                this.listData[index].status = 0
+                this.$refs.myTable.doLayout();
+                this.$message({
+                  type: 'success',
+                  message: '修改成功！'
+                })
+              } else {
+                this.$message({
+                  type: 'info',
+                  message: res.msg
+                })
+              }
+            })
+            .catch(err => {
+              this.editFormVisible = false
+              this.loading = false
+              this.$message.error('公司保存失败，请稍后再试！')
+            })
     },
     //上传图片
     handleOnSuccess(e) {

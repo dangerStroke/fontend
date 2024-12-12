@@ -205,6 +205,7 @@ export default {
       this.formInline.username = ''
       this.formInline.telPhone = ''
       this.formInline.id = ''
+      this.formInline.orderState = ""
     },
     //显示编辑界面
     handleEdit: function(index, row, type) {

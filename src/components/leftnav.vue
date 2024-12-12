@@ -116,14 +116,14 @@ export default {
               url: 'operationManagement/customerService',
               menus: null
             },
-            {
-              menuid: 55,
-              icon: 'icon-cat-skuQuery',
-              menuname: '公司信息管理',
-              hasThird: 'N',
-              url: 'companyInfo/about',
-              menus: null
-            },
+            // {
+            //   menuid: 55,
+            //   icon: 'icon-cat-skuQuery',
+            //   menuname: '公司信息管理',
+            //   hasThird: 'N',
+            //   url: 'companyInfo/about',
+            //   menus: null
+            // },
             {
               menuid: 56,
               icon: 'icon-cat-skuQuery',
