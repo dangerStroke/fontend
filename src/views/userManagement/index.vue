@@ -10,11 +10,31 @@
     </el-breadcrumb>
     <!-- 搜索筛选 -->
     <el-form :inline="true" :model="formInline" class="user-search">
-      <el-form-item label="搜索：">
-        <el-input size="small" v-model="formInline.deptName" placeholder="输入部门名称"></el-input>
+      <el-form-item label="用户名称">
+        <el-input size="small" v-model="formInline.username" placeholder="输入用户名称"></el-input>
       </el-form-item>
-      <el-form-item label="">
-        <el-input size="small" v-model="formInline.deptNo" placeholder="输入部门代码"></el-input>
+      <el-form-item label="手机号">
+        <el-input size="small" v-model="formInline.phone" placeholder="输入手机号码"></el-input>
+      </el-form-item>
+      <el-form-item label="会员到期时间">
+        <el-date-picker
+          v-model="formInline.vipExpirationTime"
+          type="daterange"
+          value-format="yyyy-MM-dd"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+          :default-time="['00:00:00', '23:59:59']">
+        </el-date-picker>
+      </el-form-item>
+      <el-form-item label="创建时间">
+        <el-date-picker
+          v-model="formInline.createTime"
+          type="daterange"
+          value-format="yyyy-MM-dd"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+          :default-time="['00:00:00', '23:59:59']">
+        </el-date-picker>
       </el-form-item>
       <el-form-item>
         <el-button size="small" type="primary" icon="el-icon-search" @click="search">搜索</el-button>
@@ -25,34 +45,88 @@
     <el-table size="small" :data="listData" highlight-current-row v-loading="loading" border element-loading-text="拼命加载中" style="width: 100%;">
       <el-table-column align="center" type="selection" width="60">
       </el-table-column>
-      <el-table-column sortable prop="deptName" label="部门名称" width="300">
+      <el-table-column  prop="id" label="ID" width="100">
       </el-table-column>
-      <el-table-column sortable prop="deptNo" label="部门代码" width="300">
+      <el-table-column  prop="username" label="用户名称" width="100">
       </el-table-column>
-      <el-table-column sortable prop="editTime" label="修改时间" width="300">
+      <el-table-column align="center" prop="headImage" label="用户头像" width="100">
         <template slot-scope="scope">
-          <div>{{scope.row.editTime|timestampToTime}}</div>
+          <el-image 
+            style="width: 60px; height: 60px"
+            :src="imgUrl + scope.row.headImage"
+            :preview-src-list="[imgUrl + scope.row.headImage]">
+          </el-image>
         </template>
       </el-table-column>
-      <el-table-column sortable prop="editUser" label="修改人" width="300">
+      <el-table-column  prop="phone" label="用户手机号" width="100">
       </el-table-column>
-      <el-table-column align="center" label="操作" min-width="300">
+      <el-table-column  prop="vipFlag" label="是否是VIP" width="100">
+      </el-table-column>
+      <el-table-column  prop="vipExpirationTime" label="会员到期时间" width="100">
+      </el-table-column>
+      <el-table-column sortable prop="totalOrderNum" label="总订单数量" width="120">
+      </el-table-column>
+      <el-table-column sortable prop="successOrderNum" label="成功订单量" width="120">
+      </el-table-column>
+      <el-table-column sortable prop="failOrderNum" label="失败订单量" width="120">
+      </el-table-column>
+      <el-table-column sortable prop="totalRevenue" label="总收益" width="120">
+
+      </el-table-column>
+      <el-table-column sortable prop="totalRevenue" label="账户余额" width="120">
+        
+      </el-table-column>
+      <el-table-column sortable prop="revenueBalance" label="支付宝账户" width="120">
+      </el-table-column>
+      <el-table-column sortable prop="bankName" label="银行名称" width="120">
+      </el-table-column>
+      <el-table-column sortable prop="bankUsername" label="银行用户" width="120">
+      </el-table-column>
+      <el-table-column sortable prop="bankNumber" label="银行卡号" width="120">
+      </el-table-column>
+      <el-table-column prop="createTime" label="创建时间" width="100">
+      </el-table-column>
+      <el-table-column align="center" label="操作" min-width="200">
         <template slot-scope="scope">
           <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+          <el-button size="mini" type="primary" @click="handleActive(scope.$index, scope.row, )" v-if="scope.row.state == -1">启用</el-button>
+          <el-button size="mini" type="warning" @click="handleActive(scope.$index, scope.row)" v-if="scope.row.state == 0">禁用</el-button>
           <el-button size="mini" type="danger" @click="deleteUser(scope.$index, scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
     <!-- 分页组件 -->
     <Pagination v-bind:child-msg="pageparm" @callFather="callFather"></Pagination>
-    <!-- 编辑界面 -->
+    <!-- 修改界面 -->
     <el-dialog :title="title" :visible.sync="editFormVisible" width="30%" @click="closeDialog">
       <el-form label-width="120px" :model="editForm" :rules="rules" ref="editForm">
-        <el-form-item label="部门名称" prop="deptName">
-          <el-input size="small" v-model="editForm.deptName" auto-complete="off" placeholder="请输入部门名称"></el-input>
+        <el-form-item label="用户名称" prop="username">
+          <el-input size="small" v-model="editForm.username" auto-complete="off" ></el-input>
         </el-form-item>
-        <el-form-item label="部门代码" prop="deptNo">
-          <el-input size="small" v-model="editForm.deptNo" auto-complete="off" placeholder="请输入部门代码"></el-input>
+        <el-form-item label="用户手机号" prop="phone">
+          <el-input size="small" :disabled="editForm.userId != false" v-model="editForm.phone" auto-complete="off" ></el-input>
+        </el-form-item>
+        <el-form-item label="用户密码" prop="password" v-if="!editForm.userId">
+          <el-input size="small" v-model="editForm.password" auto-complete="off" ></el-input>
+        </el-form-item>
+        <el-form-item label="上传用户头像" prop="headImage" v-if="editForm.userId">
+          <el-upload
+            class="avatar-uploader"
+            :action="baseUrl+'/broadband/common/file/uploadImage'"
+            :show-file-list="false"
+            :on-success="handleOnSuccess"
+            :on-remove="handleRemove">
+            <img v-if="editForm.headImage" :src="imgUrl+editForm.headImage" class="avatar">
+            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+          </el-upload>
+        </el-form-item>
+        <el-form-item label="会员到期时间" prop="vipExpirationTime" v-if="editForm.userId">
+          <el-date-picker
+            v-model="editForm.vipExpirationTime"
+            value-format="yyyy-MM-dd"
+            type="date"
+            placeholder="会员到期时间">
+          </el-date-picker>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -64,40 +138,44 @@
 </template>
 
 <script>
-import { deptList, deptSave, deptDelete } from '../../api/userMG'
+import { getUserPage, userDisable, userEnable, userAdd, userUpdateVip, userInfoUpdate } from '../../api/api'
 import Pagination from '../../components/Pagination'
 export default {
   data() {
     return {
-      nshow: true, //switch开启
-      fshow: false, //switch关闭
+      imgUrl: process.env.VUE_IMG_BASE_URL,
+      baseUrl: process.env.VUE_IMG_BASE_URL,
       loading: false, //是显示加载
       editFormVisible: false, //控制编辑页面显示与隐藏
       title: '添加',
       editForm: {
-        deptId: '',
-        deptName: '',
-        deptNo: '',
-        token: localStorage.getItem('logintoken')
+        userId:'',
+        headImage: '',
+        username: '',
+        phone: '',
+        vipExpirationTime:'',
+        password:''
       },
       // rules表单验证
       rules: {
-        deptName: [
+        username: [
           { required: true, message: '请输入部门名称', trigger: 'blur' }
         ],
-        deptNo: [{ required: true, message: '请输入部门代码', trigger: 'blur' }]
+        phone: [{ required: true, message: '请输入部门代码', trigger: 'blur' }],
+        // headImage: [{ required: true, message: '请上传头像', trigger: 'blur' }],
+        // vipExpirationTime: [{ required: true, message: '请选择会员到期时间', trigger: 'blur' }],
+        password: [{ required: true, message: '请输入初始密码', trigger: 'blur' }]
       },
       formInline: {
-        page: 1,
+        pageNo: 1,
         pageSize: 10,
-        varLable: '',
-        varName: '',
-        token: localStorage.getItem('logintoken')
+        username: '',
+        phone: '',
+        vipExpirationTime:''
       },
       // 删除部门
       seletedata: {
         ids: '',
-        token: localStorage.getItem('logintoken')
       },
       userparm: [], //搜索权限
       listData: [], //用户数据
@@ -131,98 +209,42 @@ export default {
     // 获取公司列表
     getdata(parameter) {
       this.loading = true
-      // 模拟数据开始
-      let res = {
-        code: 0,
-        msg: null,
-        count: 5,
-        data: [
-          {
-            addUser: null,
-            editUser: null,
-            addTime: 1521062371000,
-            editTime: 1526700200000,
-            deptId: 2,
-            deptName: 'XX分公司',
-            deptNo: '1',
-            parentId: 1
-          },
-          {
-            addUser: null,
-            editUser: null,
-            addTime: 1521063247000,
-            editTime: 1526652291000,
-            deptId: 3,
-            deptName: '上海测试',
-            deptNo: '02',
-            parentId: 1
-          },
-          {
-            addUser: null,
-            editUser: null,
-            addTime: 1526349555000,
-            editTime: 1526349565000,
-            deptId: 12,
-            deptName: '1',
-            deptNo: '11',
-            parentId: 1
-          },
-          {
-            addUser: null,
-            editUser: null,
-            addTime: 1526373178000,
-            editTime: 1526373178000,
-            deptId: 13,
-            deptName: '5',
-            deptNo: '5',
-            parentId: 1
-          },
-          {
-            addUser: null,
-            editUser: null,
-            addTime: 1526453107000,
-            editTime: 1526453107000,
-            deptId: 17,
-            deptName: 'v',
-            deptNo: 'v',
-            parentId: 1
-          }
-        ]
+      let parameters = JSON.parse(JSON.stringify(parameter))
+      if(parameters.createTime) {
+        parameters['joinStartTime'] = parameters.createTime[0]
+        parameters['joinEndTime'] = parameters.createTime[1]
       }
-      this.loading = false
-      this.listData = res.data
-      this.pageparm.currentPage = this.formInline.page
-      this.pageparm.pageSize = this.formInline.pageSize
-      this.pageparm.total = res.count
-      // 模拟数据结束
-
+      if(parameters.vipExpirationTime) {
+        parameters['vipExpirationStarTime'] = parameters.vipExpirationTime[0]
+        parameters['vipExpirationEndTime'] = parameters.vipExpirationTime[1]
+      }
       /***
        * 调用接口，注释上面模拟数据 取消下面注释
        */
-      // deptList(parameter)
-      //   .then(res => {
-      //     this.loading = false
-      //     if (res.success == false) {
-      //       this.$message({
-      //         type: 'info',
-      //         message: res.msg
-      //       })
-      //     } else {
-      //       this.listData = res.data
-      //       // 分页赋值
-      //       this.pageparm.currentPage = this.formInline.page
-      //       this.pageparm.pageSize = this.formInline.pageSize
-      //       this.pageparm.total = res.count
-      //     }
-      //   })
-      //   .catch(err => {
-      //     this.loading = false
-      //     this.$message.error('菜单加载失败，请稍后再试！')
-      //   })
+      getUserPage(parameters)
+        .then(res => {
+          this.loading = false
+          if (res.success == false) {
+            this.$message({
+              type: 'info',
+              message: res.msg
+            })
+          } else {
+            this.listData = res.data.items
+            // 分页赋值
+            this.pageparm.currentPage = this.formInline.pageNo
+            this.pageparm.pageSize = this.formInline.pageSize
+            this.pageparm.total = res.data.totalNum
+          }
+        })
+        .catch(err => {
+          this.loading = false
+          this.$message.error('菜单加载失败，请稍后再试！')
+        })
     },
     // 分页插件事件
     callFather(parm) {
-      this.formInline.page = parm.currentPage
+      this.formInline.pageNo = parm.currentPage
       this.formInline.pageSize = parm.pageSize
       this.getdata(this.formInline)
     },
@@ -234,22 +256,30 @@ export default {
     handleEdit: function(index, row) {
       this.editFormVisible = true
       if (row != undefined && row != 'undefined') {
-        this.title = '修改'
-        this.editForm.deptId = row.deptId
-        this.editForm.deptName = row.deptName
-        this.editForm.deptNo = row.deptNo
+        console.log(row)
+        this.title = '修改用户信息'
+        this.editForm.userId = row.id,
+        this.editForm.headImage = row.headImage
+        this.editForm.username = row.username
+        this.editForm.phone = row.phone
+        this.editForm.vipExpirationTime = row.vipExpirationTime
+        this.editForm.password = row.password
       } else {
-        this.title = '添加'
-        this.editForm.deptId = ''
-        this.editForm.deptName = ''
-        this.editForm.deptNo = ''
+        this.title = '添加用户信息'
+        this.editForm.userId = ""
+        this.editForm.headImage = ''
+        this.editForm.username = ''
+        this.editForm.phone = ''
+        this.editForm.vipExpirationTime=""
+        this.editForm.password = ""
       }
     },
     // 编辑、增加页面保存方法
     submitForm(editData) {
       this.$refs[editData].validate(valid => {
         if (valid) {
-          deptSave(this.editForm)
+          if(editData.userId) {
+            userUpdateVip(this.editForm)
             .then(res => {
               this.editFormVisible = false
               this.loading = false
@@ -271,10 +301,75 @@ export default {
               this.loading = false
               this.$message.error('公司保存失败，请稍后再试！')
             })
+            userInfoUpdate(this.editForm)
+            .then(res => {
+              this.editFormVisible = false
+              this.loading = false
+              if (res.success) {
+                this.getdata(this.formInline)
+                this.$message({
+                  type: 'success',
+                  message: '公司保存成功！'
+                })
+              } else {
+                this.$message({
+                  type: 'info',
+                  message: res.msg
+                })
+              }
+            })
+            .catch(err => {
+              this.editFormVisible = false
+              this.loading = false
+              this.$message.error('公司保存失败，请稍后再试！')
+            })
+          }else {
+            userAdd(this.editForm)
+            .then(res => {
+              this.editFormVisible = false
+              this.loading = false
+              if (res.success) {
+                this.getdata(this.formInline)
+                this.$message({
+                  type: 'success',
+                  message: '公司保存成功！'
+                })
+              } else {
+                this.$message({
+                  type: 'info',
+                  message: res.msg
+                })
+              }
+            })
+            .catch(err => {
+              this.editFormVisible = false
+              this.loading = false
+              this.$message.error('公司保存失败，请稍后再试！')
+            })
+          }
         } else {
           return false
         }
       })
+    },
+    //启用禁用
+    handleActive: function(index, row) {
+      //启用
+      if(row.state == 0) {
+        userEnable({id:row.id}).then(res => {
+          if(res.code == 200) {
+            this.listData[index].state = 0
+            this.$refs.myTable.doLayout();
+          }
+        })
+      }else{
+        userDisable({id:row.id}).then(res => {
+          if(res.code == 200) {
+            this.listData[index].state = -1
+            this.$refs.myTable.doLayout();
+          }
+        })
+      }
     },
     // 删除公司
     deleteUser(index, row) {
@@ -284,7 +379,7 @@ export default {
         type: 'warning'
       })
         .then(() => {
-          deptDelete(row.deptId)
+          deptDelete(row.headImage)
             .then(res => {
               if (res.success) {
                 this.$message({
@@ -314,6 +409,13 @@ export default {
     // 关闭编辑、增加弹出框
     closeDialog() {
       this.editFormVisible = false
+    },
+    //上传图片
+    handleOnSuccess(e) {
+      this.editForm.headImage=e.data
+    },
+    handleRemove() {
+      this.editForm.headImage = ""
     }
   }
 }
@@ -328,5 +430,30 @@ export default {
 }
 </style>
 
- 
+<style>
+.avatar-uploader .el-upload {
+  border: 1px dashed #d9d9d9;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.avatar-uploader .el-upload:hover {
+  border-color: #409EFF;
+}
+.avatar-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 178px;
+  height: 178px;
+  line-height: 178px;
+  text-align: center;
+}
+.avatar {
+  width: 178px;
+  height: 178px;
+  display: block;
+}
+</style>
+
  

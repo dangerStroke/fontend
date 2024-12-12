@@ -15,7 +15,7 @@
       </el-form-item>
       <el-form-item>
         <el-button size="small" type="primary" icon="el-icon-search" @click="search">搜索</el-button>
-        <el-button size="small" type="primary" icon="el-icon-refresh" @click="formInline={}">重置</el-button>
+        <el-button size="small" type="primary" icon="el-icon-refresh" @click="refresh">重置</el-button>
         <el-button size="small" type="primary" icon="el-icon-plus" @click="handleEdit()">添加</el-button>
       </el-form-item>
     </el-form>
@@ -189,6 +189,9 @@ export default {
     search() {
       this.formInline.orderNum = Number(this.formInline.orderNum)
       this.getdata(this.formInline)
+    },
+    refresh() {
+      this.formInline.title = ""
     },
     //显示编辑界面
     handleEdit: function(index, row) {

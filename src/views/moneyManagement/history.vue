@@ -36,12 +36,6 @@
       </el-table-column>
       <el-table-column sortable prop="editUser" label="修改人" width="300">
       </el-table-column>
-      <el-table-column align="center" label="操作" min-width="300">
-        <template slot-scope="scope">
-          <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-          <el-button size="mini" type="danger" @click="deleteUser(scope.$index, scope.row)">删除</el-button>
-        </template>
-      </el-table-column>
     </el-table>
     <!-- 分页组件 -->
     <Pagination v-bind:child-msg="pageparm" @callFather="callFather"></Pagination>

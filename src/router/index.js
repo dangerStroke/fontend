@@ -121,7 +121,7 @@ export default new Router({
             }
         }, {
             path: '/operationManagement/customerService',
-            name: '客服',
+            name: '客服管理',
             component: CustomerService,
             meta: {
                 requireAuth: true

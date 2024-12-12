@@ -16,15 +16,22 @@
       <el-form-item label="联系人">
         <el-input size="small" clearable v-model="formInline.username" placeholder="输入联系人"></el-input>
       </el-form-item>
-      <el-form-item label="联系人电话">
-        <el-input size="small" clearable v-model="formInline.telPhone" placeholder="输入联系人电话"></el-input>
+      <el-form-item label="联系人手机号">
+        <el-input size="small" clearable v-model="formInline.telPhone" placeholder="输入联系人手机号"></el-input>
       </el-form-item>
       <el-form-item label="订单状态">
-        <el-input size="small" clearable v-model="formInline.orderState" placeholder="输入订单状态"></el-input>
+        <el-select clearable v-model="formInline.orderState" placeholder="请选择订单状态">
+          <el-option
+            v-for="item in orderStateList"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
+          </el-option>
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button size="small" type="primary" icon="el-icon-search" @click="search">搜索</el-button>
-        <el-button size="small" type="primary" icon="el-icon-refresh" @click="formInline={}">重置</el-button>
+        <el-button size="small" type="primary" icon="el-icon-refresh" @click="refresh">重置</el-button>
         <!-- <el-button size="small" type="primary" icon="el-icon-plus" @click="handleEdit()">添加</el-button> -->
       </el-form-item>
     </el-form>
@@ -38,11 +45,11 @@
       </el-table-column>
       <el-table-column align="center"  prop="username" label="联系人" width="100">
       </el-table-column>
-      <el-table-column align="center"  prop="telPhone" label="联系人电话" width="120">
+      <el-table-column align="center"  prop="telPhone" label="联系人手机号" width="120">
       </el-table-column>
       <el-table-column align="center"  prop="address" label="联系人地址" width="150">
       </el-table-column>
-      <el-table-column align="center"  prop="" label="备注" width="200">
+      <el-table-column align="center"  prop="orderComment" label="备注" width="200">
       </el-table-column>
       <el-table-column align="center"  prop="comboName" label="套餐名称" width="150">
       </el-table-column>
@@ -50,14 +57,14 @@
       </el-table-column>
       <el-table-column align="center" prop="orderUsername" label="下单人" width="80">
       </el-table-column>
-      <el-table-column align="center" prop="" label="下单人电话" width="120">
+      <el-table-column align="center" prop="" label="下单人手机号" width="120">
       </el-table-column>
       <el-table-column align="center" prop="createTime" label="创建时间" width="200">
       </el-table-column>
       <el-table-column align="center" label="操作" min-width="300">
         <template slot-scope="scope">
-          <el-button size="mini" type="info" @click="handleEdit(scope.$index, scope.row)">修改订单状态</el-button>
-          <el-button size="mini" type="danger" @click="deleteUser(scope.$index, scope.row)">删除</el-button>
+          <el-button size="mini" type="primary" @click="handleEdit(scope.$index, scope.row, 1)" v-if="scope.row.orderState == 0">同意</el-button>
+          <el-button size="mini"  type="danger" @click="handleEdit(scope.$index, scope.row, 0)" v-if="scope.row.orderState == 0">拒绝</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -66,14 +73,8 @@
     <!-- 编辑界面 -->
     <el-dialog :title="title" :visible.sync="editFormVisible" width="30%" @click="closeDialog">
       <el-form label-width="120px" :model="editForm" :rules="rules" ref="editForm">
-        <el-form-item label="订单号" prop="orderNo">
-          <el-input size="small" v-model="editForm.orderNo" auto-complete="off" placeholder="请输入序号"></el-input>
-        </el-form-item>
-        <el-form-item label="用户名称" prop="username">
-          <el-input size="small" v-model="editForm.title" auto-complete="off" placeholder="请输入名称"></el-input>
-        </el-form-item>
-        <el-form-item label="上传图片" prop="telPhone">
-          <el-input size="small" v-model="editForm.telPhone" auto-complete="off" placeholder="请输入名称"></el-input>
+        <el-form-item label="" prop="result">
+          <el-input type="textarea" size="small" clearable v-model="editForm.orderComment" placeholder="请填写备注"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -85,7 +86,7 @@
 </template>
 
 <script>
-import { getOrderList} from "../../api/api"
+import { getOrderList, updateOrderState} from "../../api/api"
 import Pagination from '../../components/Pagination'
 export default {
   data() {
@@ -96,21 +97,31 @@ export default {
       fshow: false, //switch关闭
       loading: false, //是显示加载
       editFormVisible: false, //控制编辑页面显示与隐藏
-      title: '添加轮播图',
+      title: '添加同意备注',
+      orderStateList:[
+        {
+          value:-1,
+          label:'办理失败'
+        },
+        {
+          value:1,
+          label:'办理成功'
+        },
+        {
+          value:0,
+          label:'办理中'
+        }
+      ],
       editForm: {
         id:'',
-        orderNo: '',
-        username:'',
-        telPhone:'',
-        orderState:0,
+        result:'',
+        orderComment:''
       },
       // rules表单验证
       rules: {
-        orderNo: [
-          { required: true, message: '请输入序号', trigger: 'blur' }
+        result: [
+          { required: true, message: '请输入备注', trigger: 'blur' }
         ],
-        title: [{ required: true, message: '请输入名称', trigger: 'blur' }],
-        telPhone: [{ required: true, message: '请上传图片', trigger: 'blur' }]
       },
       formInline: {
         pageNo: 1,
@@ -189,24 +200,32 @@ export default {
     search() {
       this.getdata(this.formInline)
     },
+    refresh() {
+      this.formInline.orderNo = ''
+      this.formInline.username = ''
+      this.formInline.telPhone = ''
+      this.formInline.id = ''
+    },
     //显示编辑界面
-    handleEdit: function(index, row) {
+    handleEdit: function(index, row, type) {
+      this.editForm.orderComment = ''
+      this.editForm.result = ''
       this.editFormVisible = true
-      if (row != undefined && row != 'undefined') {
-        this.title = '修改订单状态'
-        this.editForm.orderNo = row.orderNo
-        this.editForm.username = row.username
-        this.editForm.telPhone = row.telPhone
-        this.editForm.orderState = row.orderState
+      if (type==1) {
+        this.title = '请填写同意后的备注'
         this.editForm.id = row.id
+        this.editForm.result='SUCCESS'
+      }else{
+        this.title = '请填写拒绝后的备注'
+        this.editForm.id = row.id
+        this.editForm.result='FAIL'
       }
     },
     // 编辑、增加页面保存方法
     submitForm(editData) {
       this.$refs[editData].validate(valid => {
         if (valid) {
-          if(!this.editForm.id) {
-            bannerAdd(this.editForm)
+          updateOrderState(this.editForm)
             .then(res => {
               this.editFormVisible = false
               this.loading = false
@@ -228,30 +247,6 @@ export default {
               this.loading = false
               this.$message.error('保存失败，请稍后再试！')
             })
-          }else {
-            bannerUpdate(this.editForm)
-            .then(res => {
-              this.editFormVisible = false
-              this.loading = false
-              if (res.success) {
-                this.getdata(this.formInline)
-                this.$message({
-                  type: 'success',
-                  message: '上传成功！'
-                })
-              } else {
-                this.$message({
-                  type: 'info',
-                  message: res.msg
-                })
-              }
-            })
-            .catch(err => {
-              this.editFormVisible = false
-              this.loading = false
-              this.$message.error('保存失败，请稍后再试！')
-            })
-          }
         } else {
           return false
         }

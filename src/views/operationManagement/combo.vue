@@ -14,11 +14,18 @@
         <el-input size="small" clearable v-model="formInline.comboName" placeholder="套餐名称"></el-input>
       </el-form-item>
       <el-form-item label="套餐类型：">
-        <el-input size="small" clearable v-model="formInline.comboType" placeholder="套餐类型"></el-input>
+        <el-select clearable v-model="formInline.comboType" placeholder="请选择订单状态">
+          <el-option
+            v-for="item in typeList"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
+          </el-option>
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button size="small" type="primary" icon="el-icon-search" @click="search">搜索</el-button>
-        <el-button size="small" type="primary" icon="el-icon-refresh" @click="formInline={}">重置</el-button>
+        <el-button size="small" type="primary" icon="el-icon-refresh" @click="refresh">重置</el-button>
         <el-button size="small" type="primary" icon="el-icon-plus" @click="handleEdit()">添加</el-button>
       </el-form-item>
     </el-form>
@@ -48,6 +55,8 @@
       <el-table-column align="center" prop="supplierName" label="供应商名称" width="120">
       </el-table-column>
       <el-table-column align="center" sortable prop="kickback" label="佣金" width="100">
+      </el-table-column>
+      <el-table-column align="center" sortable prop="vipKickback" label="VIP佣金" width="100">
       </el-table-column>
       <el-table-column align="center" sortable prop="shareKickback" label="分佣" width="100">
       </el-table-column>
@@ -131,7 +140,17 @@ export default {
         currentPage: 1,
         pageSize: 10,
         total: 10
-      }
+      },
+      typeList:[
+        {
+          label:'单宽带',
+          value:'-1',
+        },
+        {
+          label:'融合套餐',
+          value:'1',
+        }
+      ]
     }
   },
   // 注册组件
@@ -192,6 +211,10 @@ export default {
     // 搜索事件
     search() {
       this.getdata(this.formInline)
+    },
+    refresh() {
+      this.formInline.comboType =  ''
+      this.formInline.comboName =  ''
     },
     //显示编辑界面
     handleEdit: function(index, row) {

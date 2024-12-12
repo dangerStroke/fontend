@@ -9,37 +9,43 @@
       <el-breadcrumb-item>关于我们</el-breadcrumb-item>
     </el-breadcrumb>
     <!-- 搜索筛选 -->
-    <el-form :inline="true" :model="formInline" class="user-search">
-      <el-form-item label="搜索：">
-        <el-input size="small" v-model="formInline.deptName" placeholder="输入部门名称"></el-input>
-      </el-form-item>
-      <el-form-item label="">
-        <el-input size="small" v-model="formInline.deptNo" placeholder="输入部门代码"></el-input>
+    <!-- <el-form :inline="true" :model="formInline" class="user-search">
+      <el-form-item label="客服状态">
+        <el-select clearable v-model="formInline.status" placeholder="请选择订单状态">
+          <el-option
+            v-for="item in statusOption"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
+          </el-option>
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button size="small" type="primary" icon="el-icon-search" @click="search">搜索</el-button>
+        <el-button size="small" type="primary" icon="el-icon-refresh" @click="refresh">重置</el-button>
         <el-button size="small" type="primary" icon="el-icon-plus" @click="handleEdit()">添加</el-button>
       </el-form-item>
-    </el-form>
+    </el-form> -->
     <!--列表-->
-    <el-table size="small" :data="listData" highlight-current-row v-loading="loading" border element-loading-text="拼命加载中" style="width: 100%;">
+    <el-table ref="myTable" size="small" :data="listData" highlight-current-row v-loading="loading" border element-loading-text="拼命加载中" style="width: 100%;">
       <el-table-column align="center" type="selection" width="60">
       </el-table-column>
-      <el-table-column sortable prop="deptName" label="部门名称" width="300">
-      </el-table-column>
-      <el-table-column sortable prop="deptNo" label="部门代码" width="300">
-      </el-table-column>
-      <el-table-column sortable prop="editTime" label="修改时间" width="300">
+      <el-table-column align="center" prop="weChatQrCode" label="客服微信二维码" width="200">
         <template slot-scope="scope">
-          <div>{{scope.row.editTime|timestampToTime}}</div>
+          <el-image 
+            style="width: 60px; height: 60px"
+            :src="imgUrl + scope.row.weChatQrCode"
+            :preview-src-list="[imgUrl + scope.row.weChatQrCode]">
+          </el-image>
         </template>
       </el-table-column>
-      <el-table-column sortable prop="editUser" label="修改人" width="300">
+      <el-table-column align="center" prop="statusName" label="状态" width="120">
       </el-table-column>
       <el-table-column align="center" label="操作" min-width="300">
         <template slot-scope="scope">
           <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-          <el-button size="mini" type="danger" @click="deleteUser(scope.$index, scope.row)">删除</el-button>
+          <el-button size="mini" type="primary" @click="handleActive(scope.$index, scope.row, )" v-if="scope.row.status == -1">启用</el-button>
+          <el-button size="mini" type="warning" @click="handleActive(scope.$index, scope.row)" v-if="scope.row.status == 1">禁用</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -48,11 +54,32 @@
     <!-- 编辑界面 -->
     <el-dialog :title="title" :visible.sync="editFormVisible" width="30%" @click="closeDialog">
       <el-form label-width="120px" :model="editForm" :rules="rules" ref="editForm">
-        <el-form-item label="部门名称" prop="deptName">
-          <el-input size="small" v-model="editForm.deptName" auto-complete="off" placeholder="请输入部门名称"></el-input>
+        <el-form-item label="名称" prop="username">
+          <el-input size="small" v-model="editForm.username" auto-complete="off" placeholder="请输入名称"></el-input>
         </el-form-item>
-        <el-form-item label="部门代码" prop="deptNo">
-          <el-input size="small" v-model="editForm.deptNo" auto-complete="off" placeholder="请输入部门代码"></el-input>
+        <el-form-item label="手机号" prop="phone">
+          <el-input size="small" v-model="editForm.phone" auto-complete="off" placeholder="请输入手机号"></el-input>
+        </el-form-item>
+        <el-form-item label="状态" prop="status">
+          <el-select clearable v-model="editForm.status" placeholder="请选择状态">
+          <el-option
+            v-for="item in statusOption"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
+          </el-option>
+        </el-select>
+        </el-form-item>
+        <el-form-item label="上传微信二维码" prop="weChatQrCode">
+          <el-upload
+            class="avatar-uploader"
+            :action="baseUrl+'/broadband/common/file/uploadImage'"
+            :show-file-list="false"
+            :on-success="handleOnSuccess"
+            :on-remove="handleRemove">
+            <img v-if="editForm.weChatQrCode" :src="imgUrl+editForm.weChatQrCode" class="avatar">
+            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+          </el-upload>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -64,40 +91,49 @@
 </template>
 
 <script>
-import { deptList, deptSave, deptDelete } from '../../api/userMG'
+import { getWaiterPage, waiterAdd, waiterDisable, waiterEnable, waiterUpdate } from "../../api/api"
 import Pagination from '../../components/Pagination'
 export default {
   data() {
     return {
-      nshow: true, //switch开启
-      fshow: false, //switch关闭
+      imgUrl: process.env.VUE_IMG_BASE_URL,
+      baseUrl: process.env.VUE_IMG_BASE_URL,
       loading: false, //是显示加载
       editFormVisible: false, //控制编辑页面显示与隐藏
-      title: '添加',
+      title: '添加轮播图',
       editForm: {
-        deptId: '',
-        deptName: '',
-        deptNo: '',
-        token: localStorage.getItem('logintoken')
+        id:'',
+        phone: '',
+        username:'',
+        weChatQrCode:'',
+        status:'-1',
       },
+      statusOption:[
+        {
+          value:'1',
+          label:'启用'
+        },
+        {
+          value:'-1',
+          label:'禁用'
+        }
+      ],
       // rules表单验证
       rules: {
-        deptName: [
-          { required: true, message: '请输入部门名称', trigger: 'blur' }
+        phone: [
+          { required: true, message: '请输入排序', trigger: 'blur' }
         ],
-        deptNo: [{ required: true, message: '请输入部门代码', trigger: 'blur' }]
+        username: [{ required: true, message: '请输入名称', trigger: 'blur' }],
+        weChatQrCode: [{ required: true, message: '请上传图片', trigger: 'blur' }],
+        status: [{ required: true, message: '请选择状态', trigger: 'blur' }],
       },
       formInline: {
-        page: 1,
-        limit: 10,
-        varLable: '',
-        varName: '',
-        token: localStorage.getItem('logintoken')
+        pageNo: 1,
+        pageSize: 10,
       },
       // 删除部门
       seletedata: {
         ids: '',
-        token: localStorage.getItem('logintoken')
       },
       userparm: [], //搜索权限
       listData: [], //用户数据
@@ -131,125 +167,73 @@ export default {
     // 获取公司列表
     getdata(parameter) {
       this.loading = true
-      // 模拟数据开始
-      let res = {
-        code: 0,
-        msg: null,
-        count: 5,
-        data: [
-          {
-            addUser: null,
-            editUser: null,
-            addTime: 1521062371000,
-            editTime: 1526700200000,
-            deptId: 2,
-            deptName: 'XX分公司',
-            deptNo: '1',
-            parentId: 1
-          },
-          {
-            addUser: null,
-            editUser: null,
-            addTime: 1521063247000,
-            editTime: 1526652291000,
-            deptId: 3,
-            deptName: '上海测试',
-            deptNo: '02',
-            parentId: 1
-          },
-          {
-            addUser: null,
-            editUser: null,
-            addTime: 1526349555000,
-            editTime: 1526349565000,
-            deptId: 12,
-            deptName: '1',
-            deptNo: '11',
-            parentId: 1
-          },
-          {
-            addUser: null,
-            editUser: null,
-            addTime: 1526373178000,
-            editTime: 1526373178000,
-            deptId: 13,
-            deptName: '5',
-            deptNo: '5',
-            parentId: 1
-          },
-          {
-            addUser: null,
-            editUser: null,
-            addTime: 1526453107000,
-            editTime: 1526453107000,
-            deptId: 17,
-            deptName: 'v',
-            deptNo: 'v',
-            parentId: 1
-          }
-        ]
-      }
-      this.loading = false
-      this.listData = res.data
-      this.pageparm.currentPage = this.formInline.page
-      this.pageparm.pageSize = this.formInline.limit
-      this.pageparm.total = res.count
       // 模拟数据结束
 
       /***
        * 调用接口，注释上面模拟数据 取消下面注释
        */
-      // deptList(parameter)
-      //   .then(res => {
-      //     this.loading = false
-      //     if (res.success == false) {
-      //       this.$message({
-      //         type: 'info',
-      //         message: res.msg
-      //       })
-      //     } else {
-      //       this.listData = res.data
-      //       // 分页赋值
-      //       this.pageparm.currentPage = this.formInline.page
-      //       this.pageparm.pageSize = this.formInline.limit
-      //       this.pageparm.total = res.count
-      //     }
-      //   })
-      //   .catch(err => {
-      //     this.loading = false
-      //     this.$message.error('菜单加载失败，请稍后再试！')
-      //   })
+       getWaiterPage(parameter)
+        .then(res => {
+          this.loading = false
+          if (res.success == false) {
+            this.$message({
+              type: 'info',
+              message: res.msg
+            })
+          } else {
+            this.listData = res.data.items
+            // 分页赋值
+            this.pageparm.currentPage = this.formInline.pageNo
+            this.pageparm.pageSize = this.formInline.pageSize
+            this.pageparm.total = res.data.totalNum
+            this.loading = false
+          }
+        })
+        .catch(err => {
+          this.loading = false
+          this.$message.error('菜单加载失败，请稍后再试！')
+        })
     },
     // 分页插件事件
     callFather(parm) {
-      this.formInline.page = parm.currentPage
-      this.formInline.limit = parm.pageSize
+      this.formInline.pageNo = parm.currentPage
+      this.formInline.pageSize = parm.pageSize
       this.getdata(this.formInline)
     },
     // 搜索事件
     search() {
+      this.formInline.phone = Number(this.formInline.phone)
       this.getdata(this.formInline)
+    },
+    refresh() {
+      this.formInline.status = ""
     },
     //显示编辑界面
     handleEdit: function(index, row) {
       this.editFormVisible = true
       if (row != undefined && row != 'undefined') {
-        this.title = '修改'
-        this.editForm.deptId = row.deptId
-        this.editForm.deptName = row.deptName
-        this.editForm.deptNo = row.deptNo
+        this.title = '修改客服资料'
+        this.editForm.phone = row.phone
+        this.editForm.username = row.username
+        this.editForm.weChatQrCode = row.weChatQrCode
+        this.editForm.id = row.id
+        this.editForm.status = row.status
+        
       } else {
-        this.title = '添加'
-        this.editForm.deptId = ''
-        this.editForm.deptName = ''
-        this.editForm.deptNo = ''
+        this.title = '添加客服'
+        this.editForm.phone = ''
+        this.editForm.username = ''
+        this.editForm.weChatQrCode = ''
+        this.editForm.id = ''
+        this.editForm.status = 0
       }
     },
     // 编辑、增加页面保存方法
     submitForm(editData) {
       this.$refs[editData].validate(valid => {
         if (valid) {
-          deptSave(this.editForm)
+          if(!this.editForm.id) {
+            waiterAdd(this.editForm)
             .then(res => {
               this.editFormVisible = false
               this.loading = false
@@ -257,7 +241,7 @@ export default {
                 this.getdata(this.formInline)
                 this.$message({
                   type: 'success',
-                  message: '公司保存成功！'
+                  message: '上传成功！'
                 })
               } else {
                 this.$message({
@@ -269,8 +253,32 @@ export default {
             .catch(err => {
               this.editFormVisible = false
               this.loading = false
-              this.$message.error('公司保存失败，请稍后再试！')
+              this.$message.error('保存失败，请稍后再试！')
             })
+          }else {
+            waiterUpdate(this.editForm)
+            .then(res => {
+              this.editFormVisible = false
+              this.loading = false
+              if (res.success) {
+                this.getdata(this.formInline)
+                this.$message({
+                  type: 'success',
+                  message: '上传成功！'
+                })
+              } else {
+                this.$message({
+                  type: 'info',
+                  message: res.msg
+                })
+              }
+            })
+            .catch(err => {
+              this.editFormVisible = false
+              this.loading = false
+              this.$message.error('保存失败，请稍后再试！')
+            })
+          }
         } else {
           return false
         }
@@ -284,12 +292,12 @@ export default {
         type: 'warning'
       })
         .then(() => {
-          deptDelete(row.deptId)
+          bannerDelete({id:row.id})
             .then(res => {
               if (res.success) {
                 this.$message({
                   type: 'success',
-                  message: '公司已删除!'
+                  message: '删除成功'
                 })
                 this.getdata(this.formInline)
               } else {
@@ -301,7 +309,7 @@ export default {
             })
             .catch(err => {
               this.loading = false
-              this.$message.error('公司删除失败，请稍后再试！')
+              this.$message.error('删除失败，请稍后再试！')
             })
         })
         .catch(() => {
@@ -314,7 +322,38 @@ export default {
     // 关闭编辑、增加弹出框
     closeDialog() {
       this.editFormVisible = false
+      this.editForm.phone = ''
+      this.editForm.username = ''
+      this.editForm.weChatQrCode = ''
+      this.editForm.id = ''
+    },
+    //启用禁用
+    handleActive: function(index, row) {
+      //启用
+      if(row.status == -1) {
+        waiterEnable({id:row.id}).then(res => {
+          if(res.code == 200) {
+            this.listData[index].status = 1
+            this.$refs.myTable.doLayout();
+          }
+        })
+      }else{
+        waiterDisable({id:row.id}).then(res => {
+          if(res.code == 200) {
+            this.listData[index].status = -1
+            this.$refs.myTable.doLayout();
+          }
+        })
+      }
+    },
+    //上传图片
+    handleOnSuccess(e) {
+      this.editForm.weChatQrCode=e.data
+    },
+    handleRemove() {
+      this.editForm.weChatQrCode = ""
     }
+    
   }
 }
 </script>
@@ -326,6 +365,31 @@ export default {
 .userRole {
   width: 100%;
 }
+</style>
+<style>
+  .avatar-uploader .el-upload {
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .avatar-uploader .el-upload:hover {
+    border-color: #409EFF;
+  }
+  .avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 178px;
+    height: 178px;
+    line-height: 178px;
+    text-align: center;
+  }
+  .avatar {
+    width: 178px;
+    height: 178px;
+    display: block;
+  }
 </style>
 
  

@@ -111,7 +111,7 @@ export default {
             {
               menuid: 54,
               icon: 'icon-cat-skuQuery',
-              menuname: '客服',
+              menuname: '客服管理',
               hasThird: 'N',
               url: 'operationManagement/customerService',
               menus: null
