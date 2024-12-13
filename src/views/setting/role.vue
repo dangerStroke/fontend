@@ -64,7 +64,7 @@
     </el-dialog>
     <!-- 菜单权限 -->
     <el-dialog title="菜单权限" :visible.sync="menuAccessshow" width="30%" @click='closeDialog("perm")'>
-      <el-tree default-expand-all :data="RoleRight" :props="RoleRightProps" :default-checked-keys="checkmenu" node-key="menuid" show-checkbox>
+      <el-tree ref="tree" default-expand-all :data="RoleRight" :props="RoleRightProps" :default-checked-keys="checkmenu" node-key="menuid" show-checkbox>
       </el-tree>
       <div slot="footer" class="dialog-footer">
         <el-button size="small" @click='closeDialog("perm")'>取消</el-button>
@@ -78,7 +78,8 @@
 import {
   getRolePage,
   updateRole,
-  createRole
+  createRole,
+  updateRoleMenus
 }from '../../api/api'
 import Pagination from '../../components/Pagination'
 export default {
@@ -160,6 +161,7 @@ export default {
           url: 'operationManagement',
           menus: [
             {
+              parentId:5,
               menuid: 51,
               icon: 'el-icon-picture',
               menuname: '轮播图管理',
@@ -168,6 +170,7 @@ export default {
               menus: null
             },
             {
+              parentId:5,
               menuid: 52,
               icon: 'icon-cat-skuQuery',
               menuname: '供应商管理',
@@ -176,6 +179,7 @@ export default {
               menus: null
             },
             {
+              parentId:5,
               menuid: 53,
               icon: 'icon-cat-skuQuery',
               menuname: '套餐管理',
@@ -184,6 +188,7 @@ export default {
               menus: null
             },
             {
+              parentId:5,
               menuid: 54,
               icon: 'icon-cat-skuQuery',
               menuname: '客服管理',
@@ -200,6 +205,7 @@ export default {
             //   menus: null
             // },
             {
+              parentId:5,
               menuid: 56,
               icon: 'icon-cat-skuQuery',
               menuname: '关于我们',
@@ -208,6 +214,7 @@ export default {
               menus: null
             },
             {
+              parentId:5,
               menuid: 57,
               icon: 'icon-cat-skuQuery',
               menuname: '公告',
@@ -216,6 +223,7 @@ export default {
               menus: null
             },
             {
+              parentId:5,
               menuid: 58,
               icon: 'icon-cat-skuQuery',
               menuname: '收款账号设置',
@@ -233,6 +241,7 @@ export default {
           url: 'financeManagement',
           menus: [
             {
+              parentId:6,
               menuid: 61,
               icon: 'icon-cat-skuQuery',
               menuname: '提现申请',
@@ -240,6 +249,7 @@ export default {
               url: 'financeManagement/apply',
               menus: null
             }, {
+              parentId:6,
               menuid: 62,
               icon: 'icon-cat-skuQuery',
               menuname: '历史打款记录',
@@ -266,6 +276,7 @@ export default {
           url: 'setting',
           menus: [
             {
+              parentId:8,
               menuid: 81,
               icon: 'icon-cms-manage',
               menuname: '角色管理',
@@ -273,6 +284,7 @@ export default {
               url: 'setting/role',
               menus: null
             }, {
+              parentId:8,
               menuid: 82,
               icon: 'icon-news-manage',
               menuname: '用户管理',
@@ -322,7 +334,7 @@ export default {
    */
 
   methods: {
-    // 获取角色列表
+    // 获取列表
     getdata(parameter) {
       // 模拟数据
       this.loading = false
@@ -486,81 +498,51 @@ export default {
       }
       this.checkmenu = change
     },
-    // tree 递归
-    changeArr(list) {
-      var temptree = [],
-        tree = [],
-        items = []
-      for (var i in list) {
-        if (!temptree[list[i].id]) {
-          var trow = {
-            id: list[i].id,
-            pId: list[i].pId,
-            name: list[i].name,
-            open: list[i].open,
-            checked: list[i].checked,
-            children: []
+    
+    buildCheckedTree(treeData, checkedKeys) {
+      return treeData.reduce((acc, node) => {
+        if (checkedKeys.includes(node.menuid)) {
+          console.log(node)
+          const newNode = {...node};
+          if (node.menus) {
+            console.log(node)
+            // newNode.menus = this.buildCheckedTree(node.menus, checkedKeys);
           }
-          temptree[list[i].id] = trow
-          items.push(trow)
+          acc.push(newNode);
         }
-        if (list[i].uid > 0) {
-          temptree[list[i].id]['children'].push({
-            id: list[i].id,
-            pId: list[i].pId,
-            name: list[i].name,
-            open: list[i].open,
-            checked: list[i].checked,
-            children: []
-          })
-        }
-      }
-
-      for (var j in items) {
-        if (temptree[items[j].pId]) {
-          temptree[items[j].pId]['children'].push(temptree[items[j].id])
-        } else {
-          tree.push(temptree[items[j].id])
-        }
-      }
-      temptree = null
-      items = null
-      return tree
+        return acc;
+      }, []);
     },
     // 菜单权限-保存
     menuPermSave() {
-      let parm = {
+      let param = {
         id: this.saveroleId,
-        moduleIds: ''
+        menuJson:[]
       }
       let node = this.$refs.tree.getCheckedNodes()
-      let moduleIds = []
-      if (node.length != 0) {
-        for (let i = 0; i < node.length; i++) {
-          moduleIds.push(node[i].id)
-        }
-        parm.moduleIds = JSON.stringify(moduleIds)
-      }
-      RoleRightSave(parm)
-        .then(res => {
-          if (res.success) {
-            this.$message({
-              type: 'success',
-              message: '权限保存成功'
-            })
-            this.menuAccessshow = false
-            this.getdata(this.formInline)
-          } else {
-            this.$message({
-              type: 'info',
-              message: res.msg
-            })
-          }
-        })
-        .catch(err => {
-          this.loading = false
-          this.$message.error('权限保存失败，请稍后再试！')
-        })
+      const checkedKeys = node.map(node => node.menuid);
+      param.menuJson = this.buildCheckedTree(this.RoleRight, checkedKeys);
+      console.log(param.menuJson)
+      // updateRoleMenus(param)
+      //   .then(res => {
+      //     if (res.success) {
+      //       this.$message({
+      //         type: 'success',
+      //         message: '权限保存成功'
+      //       })
+      //       this.menuAccessshow = false
+      //       this.getdata(this.formInline)
+      //     } else {
+      //       this.$message({
+      //         type: 'info',
+      //         message: res.msg
+      //       })
+      //     }
+      //   })
+      //   .catch(err => {
+      //     this.loading = false
+      //     this.$message.error('权限保存失败，请稍后再试！')
+      //   })
     },
     // 关闭编辑、增加弹出框
     closeDialog(dialog) {

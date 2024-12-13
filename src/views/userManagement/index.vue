@@ -66,27 +66,27 @@
       </el-table-column>
       <el-table-column  prop="vipExpirationTime" label="会员到期时间" width="100">
       </el-table-column>
-      <el-table-column sortable prop="totalOrderNum" label="总订单数量" width="120">
+      <el-table-column align="center" sortable prop="totalOrderNum" label="总订单数量" width="120">
       </el-table-column>
-      <el-table-column sortable prop="successOrderNum" label="成功订单量" width="120">
+      <el-table-column align="center" sortable prop="successOrderNum" label="成功订单量" width="120">
       </el-table-column>
-      <el-table-column sortable prop="failOrderNum" label="失败订单量" width="120">
+      <el-table-column align="center" sortable prop="failOrderNum" label="失败订单量" width="120">
       </el-table-column>
-      <el-table-column sortable prop="totalRevenue" label="总收益" width="120">
+      <el-table-column align="center" sortable prop="totalRevenue" label="总收益" width="120">
 
       </el-table-column>
-      <el-table-column sortable prop="totalRevenue" label="账户余额" width="120">
+      <el-table-column align="center" sortable prop="totalRevenue" label="账户余额" width="120">
         
       </el-table-column>
-      <el-table-column sortable prop="revenueBalance" label="支付宝账户" width="120">
+      <el-table-column align="center" prop="revenueBalance" label="支付宝账户" width="120">
       </el-table-column>
-      <el-table-column sortable prop="bankName" label="银行名称" width="120">
+      <el-table-column align="center" prop="bankName" label="银行名称" width="120">
       </el-table-column>
-      <el-table-column sortable prop="bankUsername" label="银行用户" width="120">
+      <el-table-column align="center" prop="bankUsername" label="银行用户" width="120">
       </el-table-column>
-      <el-table-column sortable prop="bankNumber" label="银行卡号" width="120">
+      <el-table-column align="center" prop="bankNumber" label="银行卡号" width="120">
       </el-table-column>
-      <el-table-column prop="createTime" label="创建时间" width="100">
+      <el-table-column align="center" sortable prop="createTime" label="创建时间" width="100">
       </el-table-column>
       <el-table-column align="center" label="操作" min-width="200" fixed="right">
         <template slot-scope="scope">

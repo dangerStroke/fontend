@@ -44,13 +44,17 @@
         </template>
       </el-table-column>
       <el-table-column align="center" prop="statusName" label="状态" width="120">
+        <template slot-scope="scope">
+          <span v-if="scope.row.status == 1">启用</span>
+          <span v-if="scope.row.status == 0">禁用</span>
+        </template>
       </el-table-column>
       <el-table-column align="center" prop="createTime" label="创建时间" width="150">
       </el-table-column>
       <el-table-column align="center" label="操作" min-width="200" fixed="right">
         <template slot-scope="scope">
           <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-          <el-button size="mini" type="primary" @click="handleActive(scope.$index, scope.row, )" v-if="scope.row.status == -1">启用</el-button>
+          <el-button size="mini" type="primary" @click="handleActive(scope.$index, scope.row)" v-if="scope.row.status == 0">启用</el-button>
           <el-button size="mini" type="warning" @click="handleActive(scope.$index, scope.row)" v-if="scope.row.status == 1">禁用</el-button>
         </template>
       </el-table-column>
@@ -66,7 +70,7 @@
         <el-form-item label="手机号" prop="phone">
           <el-input size="small" v-model="editForm.phone" auto-complete="off" placeholder="请输入手机号"></el-input>
         </el-form-item>
-        <el-form-item label="状态" prop="status">
+        <!-- <el-form-item label="状态" prop="status">
           <el-select clearable v-model="editForm.status" placeholder="请选择状态">
           <el-option
             v-for="item in statusOption"
@@ -75,7 +79,7 @@
             :value="item.value">
           </el-option>
         </el-select>
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="上传微信二维码" prop="weChatQrCode">
           <el-upload
             class="avatar-uploader"
@@ -112,15 +116,15 @@ export default {
         phone: '',
         username:'',
         weChatQrCode:'',
-        status:'-1',
+        status: 0,
       },
       statusOption:[
         {
-          value:'1',
+          value: 1,
           label:'启用'
         },
         {
-          value:'-1',
+          value:0,
           label:'禁用'
         }
       ],
@@ -336,7 +340,7 @@ export default {
     //启用禁用
     handleActive: function(index, row) {
       //启用
-      if(row.status == -1) {
+      if(row.status == 0) {
         waiterEnable({id:row.id}).then(res => {
           if(res.code == 200) {
             this.listData[index].status = 1
@@ -346,7 +350,7 @@ export default {
       }else{
         waiterDisable({id:row.id}).then(res => {
           if(res.code == 200) {
-            this.listData[index].status = -1
+            this.listData[index].status = 0
             this.$refs.myTable.doLayout();
           }
         })

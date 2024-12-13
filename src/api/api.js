@@ -113,6 +113,8 @@ export const sysUserEnable = (params) => { return req("get", "/broadband/manage/
 export const sysUserRefreshPassword = (params) => { return req("get", "/broadband/manage/user/resetPwd?id="+params.id, params) };
 //管理员修改密码
 export const sysUserUpdate = (params) => { return req("POST", "/broadband/manage/user/updatePassword", params) };
+//获取所有角色
+export const sysRoleList = (params) => { return req("POST", "/broadband/manage/role/list", params) };
 
 //获取角色菜单
 export const getRolePage = (params) => { return req("POST", "/broadband/manage/role/page", params) };
@@ -120,3 +122,5 @@ export const getRolePage = (params) => { return req("POST", "/broadband/manage/r
 export const createRole = (params) => { return req("POST", "/broadband/manage/role/create", params) };
 //修改角色
 export const updateRole = (params) => { return req("POST", "/broadband/manage/role/update", params) };
+//修改角色权限
+export const updateRoleMenus = (params) => { return req("POST", "/broadband/manage/role/saveRoleMenus", params) };

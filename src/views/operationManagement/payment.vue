@@ -102,7 +102,6 @@ export default {
       editFormVisible: false, //控制编辑页面显示与隐藏
       title: '修改收款账户',
       editForm: {
-        id:'',
         alipayAccount: '',
         alipayPaymentCode: '',
         alipayUsername: '',

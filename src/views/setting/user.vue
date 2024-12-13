@@ -106,7 +106,7 @@
 </template>
 
 <script>
-import { pageSysUser, sysUserDisable, sysUserEnable, sysUserAddd, sysUserRefreshPassword, sysUserUpdate } from '../../api/api'
+import { pageSysUser, sysUserDisable, sysUserEnable, sysUserAddd, sysUserRefreshPassword, sysUserUpdate, sysRoleList } from '../../api/api'
 import Pagination from '../../components/Pagination'
 export default {
   data() {
@@ -160,7 +160,8 @@ export default {
         currentPage: 1,
         pageSize: 10,
         total: 10
-      }
+      },
+      roleListOption:[]
     }
   },
   // 注册组件
@@ -176,13 +177,28 @@ export default {
    */
   created() {
     this.getdata(this.formInline)
+    this.getRoleList()
   },
 
   /**
    * 里面的方法只有被调用才会执行
    */
   methods: {
-    // 获取公司列表
+    getRoleList() {
+      this.loading = true
+      sysRoleList()
+        .then(res => {
+          this.loading = false
+          if (res.code == 200) {
+            this.roleListOption = res.data.items
+          }
+        })
+        .catch(err => {
+          this.loading = false
+          this.$message.error('菜单加载失败，请稍后再试！')
+        })
+    },
+    // 获取列表
     getdata(parameter) {
       this.loading = true
       let parameters = JSON.parse(JSON.stringify(parameter))
