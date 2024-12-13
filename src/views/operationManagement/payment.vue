@@ -36,7 +36,7 @@
           </el-image>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="操作" min-width="150">
+      <el-table-column align="center" label="操作" min-width="150" fixed="right">
         <template slot-scope="scope">
           <el-button size="mini" type="primary" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
         </template>
@@ -120,8 +120,8 @@ export default {
         weChatUsername: [{ required: true, message: '请输入微信用户名', trigger: 'blur' }],
       },
       formInline: {
-        page: 1,
-        limit: 10,
+        pageNo: 1,
+        pageSize: 10,
       },
       userparm: [], //搜索权限
       listData: [], //用户数据
@@ -171,8 +171,8 @@ export default {
             console.log(res)
             this.listData = [res.data]
             // 分页赋值
-            this.pageparm.currentPage = this.formInline.page
-            this.pageparm.pageSize = this.formInline.limit
+            this.pageparm.currentPage = this.formInline.pageNo
+            this.pageparm.pageSize = this.formInline.pageSize
             this.pageparm.total = 1
           }
         })
@@ -183,8 +183,8 @@ export default {
     },
     // 分页插件事件
     callFather(parm) {
-      this.formInline.page = parm.currentPage
-      this.formInline.limit = parm.pageSize
+      this.formInline.pageNo = parm.currentPage
+      this.formInline.pageSize = parm.pageSize
       this.getdata(this.formInline)
     },
     // 搜索事件

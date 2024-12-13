@@ -61,7 +61,7 @@
       </el-table-column>
       <el-table-column align="center" prop="createTime" label="创建时间" width="200">
       </el-table-column>
-      <el-table-column align="center" label="操作" min-width="300">
+      <el-table-column align="center" label="操作" min-width="200" fixed="right">
         <template slot-scope="scope">
           <el-button size="mini" type="primary" @click="handleEdit(scope.$index, scope.row, 1)" v-if="scope.row.orderState == 0">同意</el-button>
           <el-button size="mini"  type="danger" @click="handleEdit(scope.$index, scope.row, 0)" v-if="scope.row.orderState == 0">拒绝</el-button>

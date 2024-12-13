@@ -11,11 +11,11 @@
     <!-- 搜索筛选 -->
     <el-form :inline="true" :model="formInline" class="user-search">
 
-      <el-form-item label="搜索：">
-        <el-input size="small" v-model="formInline.roleName" placeholder="输入角色名称"></el-input>
+      <el-form-item label="角色代码">
+        <el-input size="small" v-model="formInline.name" placeholder="输入角色代码"></el-input>
       </el-form-item>
-      <el-form-item label="">
-        <el-input size="small" v-model="formInline.roleNo" placeholder="输入角色代码"></el-input>
+      <el-form-item label="角色代码">
+        <el-input size="small" v-model="formInline.code" placeholder="输入角色代码"></el-input>
       </el-form-item>
       <el-form-item>
         <el-button size="small" type="primary" icon="el-icon-search" @click="search">搜索</el-button>
@@ -24,20 +24,17 @@
     </el-form>
     <!--列表-->
     <el-table size="small" :data="listData" highlight-current-row v-loading="loading" border element-loading-text="拼命加载中" style="width: 100%;">
-      <el-table-column align="center" type="selection" width="60">
+      <el-table-column align="center" prop="name" label="角色名称" width="180">
       </el-table-column>
-      <el-table-column sortable prop="roleName" label="角色名称" width="300">
+      <el-table-column align="center" prop="code" label="角色代码" width="180">
       </el-table-column>
-      <el-table-column sortable prop="roleNo" label="角色代码" width="300">
+      <el-table-column align="center" prop="remark" label="备注" width="180">
       </el-table-column>
-      <el-table-column sortable prop="editTime" label="修改时间" width="300">
-        <template slot-scope="scope">
-          <div>{{scope.row.editTime|timestampToTime}}</div>
-        </template>
+      <el-table-column align="center" prop="updateTime" label="修改时间" width="180">
       </el-table-column>
-      <el-table-column sortable prop="editUser" label="修改人" width="300">
+      <el-table-column align="center" prop="updateUser" label="修改人" width="180">
       </el-table-column>
-      <el-table-column align="center" label="操作" min-width="300">
+      <el-table-column align="center" label="操作" min-width="300" fixed="right">
         <template slot-scope="scope">
           <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
           <el-button size="mini" type="danger" @click="deleteUser(scope.$index, scope.row)">删除</el-button>
@@ -50,14 +47,14 @@
     <!-- 编辑界面 -->
     <el-dialog :title="title" :visible.sync="editFormVisible" width="30%" @click='closeDialog("edit")'>
       <el-form label-width="120px" :model="editForm" ref="editForm" :rules="rules">
-        <el-form-item label="系统编码" prop="systemNo">
-          <el-input size="small" v-model="editForm.systemNo" auto-complete="off" placeholder="请输入系统编码"></el-input>
+        <el-form-item label="角色名称" prop="name">
+          <el-input size="small" v-model="editForm.name" auto-complete="off" placeholder="请输入角色名称"></el-input>
         </el-form-item>
-        <el-form-item label="角色名称" prop="roleName">
-          <el-input size="small" v-model="editForm.roleName" auto-complete="off" placeholder="请输入角色名称"></el-input>
+        <el-form-item label="角色代码" prop="code">
+          <el-input size="small" v-model="editForm.code" auto-complete="off" placeholder="请输入角色代码"></el-input>
         </el-form-item>
-        <el-form-item label="角色代码" prop="roleNo">
-          <el-input size="small" v-model="editForm.roleNo" auto-complete="off" placeholder="请输入角色代码"></el-input>
+        <el-form-item label="备注" prop="code">
+          <el-input size="small" v-model="editForm.remark" auto-complete="off" placeholder="请输入角色代码"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -67,7 +64,7 @@
     </el-dialog>
     <!-- 菜单权限 -->
     <el-dialog title="菜单权限" :visible.sync="menuAccessshow" width="30%" @click='closeDialog("perm")'>
-      <el-tree ref="tree" default-expand-all="" :data="RoleRight" :props="RoleRightProps" :default-checked-keys="checkmenu" node-key="id" show-checkbox>
+      <el-tree default-expand-all :data="RoleRight" :props="RoleRightProps" :default-checked-keys="checkmenu" node-key="menuid" show-checkbox>
       </el-tree>
       <div slot="footer" class="dialog-footer">
         <el-button size="small" @click='closeDialog("perm")'>取消</el-button>
@@ -79,13 +76,10 @@
 
 <script>
 import {
-  roleList,
-  roleSave,
-  roleDelete,
-  rolePwd,
-  RoleRightTree,
-  RoleRightSave
-} from '../../api/userMG'
+  getRolePage,
+  updateRole,
+  createRole
+}from '../../api/api'
 import Pagination from '../../components/Pagination'
 export default {
   data() {
@@ -97,30 +91,25 @@ export default {
       menuAccessshow: false, //控制数据权限显示与隐藏
       title: '添加',
       editForm: {
-        roleId: '',
-        systemNo: '',
-        roleNo: '',
-        roleName: '',
-        token: localStorage.getItem('logintoken')
+        id: '',
+        code: '',
+        name: '',
+        remark:''
       },
       // rules 表单验证
       rules: {
-        systemNo: [
-          { required: true, message: '请输入系统编码', trigger: 'blur' }
-        ],
-        roleNo: [
+        code: [
           { required: true, message: '请输入角色代码', trigger: 'blur' }
         ],
-        roleName: [
+        name: [
           { required: true, message: '请输入角色名称', trigger: 'blur' }
         ]
       },
       formInline: {
-        page: 1,
-        limit: 10,
-        varLable: '',
-        varName: '',
-        token: localStorage.getItem('logintoken')
+        pageNo: 1,
+        pageSize: 10,
+        name:'',
+        code:''
       },
       // 删除
       seletedata: {
@@ -130,10 +119,173 @@ export default {
       userparm: [], //搜索权限
       listData: [], //用户数据
       // 数据权限
-      RoleRight: [],
+      RoleRight: [
+      {
+          menuid: 1,
+          icon: 'li-icon-shujujiankong',
+          menuname: '数据分析',
+          hasThird: 'N',
+          url: 'dataAnalysis/index',
+          menus: null
+        },
+        {
+          menuid: 2,
+          icon: 'icon-cus-manage',
+          menuname: '用户管理',
+          hasThird: 'N',
+          url: 'userManagement/index',
+          menus: null
+        },
+        {
+          menuid: 3,
+          icon: 'icon-news-manage',
+          menuname: 'VIP管理',
+          hasThird: 'N',
+          url: 'vipManagement/index',
+          menus: null
+        },
+        {
+          menuid: 4,
+          icon: 'icon-order-manage',
+          menuname: '订单管理',
+          hasThird: 'N',
+          url: 'orderManagement/index',
+          menus: null
+        },
+        {
+          menuid: 5,
+          icon: 'icon-cms-manage',
+          menuname: '运营管理',
+          hasThird: 'N',
+          url: 'operationManagement',
+          menus: [
+            {
+              menuid: 51,
+              icon: 'el-icon-picture',
+              menuname: '轮播图管理',
+              hasThird: 'N',
+              url: 'operationManagement/swiper',
+              menus: null
+            },
+            {
+              menuid: 52,
+              icon: 'icon-cat-skuQuery',
+              menuname: '供应商管理',
+              hasThird: 'N',
+              url: 'operationManagement/supplier',
+              menus: null
+            },
+            {
+              menuid: 53,
+              icon: 'icon-cat-skuQuery',
+              menuname: '套餐管理',
+              hasThird: 'N',
+              url: 'operationManagement/combo',
+              menus: null
+            },
+            {
+              menuid: 54,
+              icon: 'icon-cat-skuQuery',
+              menuname: '客服管理',
+              hasThird: 'N',
+              url: 'operationManagement/customerService',
+              menus: null
+            },
+            // {
+            //   menuid: 55,
+            //   icon: 'icon-cat-skuQuery',
+            //   menuname: '公司信息管理',
+            //   hasThird: 'N',
+            //   url: 'companyInfo/about',
+            //   menus: null
+            // },
+            {
+              menuid: 56,
+              icon: 'icon-cat-skuQuery',
+              menuname: '关于我们',
+              hasThird: 'N',
+              url: 'operationManagement/about',
+              menus: null
+            },
+            {
+              menuid: 57,
+              icon: 'icon-cat-skuQuery',
+              menuname: '公告',
+              hasThird: 'N',
+              url: 'operationManagement/notice',
+              menus: null
+            },
+            {
+              menuid: 58,
+              icon: 'icon-cat-skuQuery',
+              menuname: '收款账号设置',
+              hasThird: 'N',
+              url: 'operationManagement/payment',
+              menus: null
+            }
+          ]
+        },
+        {
+          menuid: 6,
+          icon: 'li-icon-shangchengxitongtubiaozitihuayuanwenjian91',
+          menuname: '财务管理',
+          hasThird: null,
+          url: 'financeManagement',
+          menus: [
+            {
+              menuid: 61,
+              icon: 'icon-cat-skuQuery',
+              menuname: '提现申请',
+              hasThird: 'N',
+              url: 'financeManagement/apply',
+              menus: null
+            }, {
+              menuid: 62,
+              icon: 'icon-cat-skuQuery',
+              menuname: '历史打款记录',
+              hasThird: 'N',
+              url: 'financeManagement/history',
+              menus: null
+            }
+          ]
+        },
+        
+        {
+          menuid: 7,
+          icon: 'icon-cat-skuQuery',
+          menuname: '分销管理',
+          hasThird: 'N',
+          url: 'distribution/index',
+          menus: null
+        },
+        {
+          menuid: 8,
+          icon: 'li-icon-xitongguanli',
+          menuname: '系统设置',
+          hasThird: null,
+          url: 'setting',
+          menus: [
+            {
+              menuid: 81,
+              icon: 'icon-cms-manage',
+              menuname: '角色管理',
+              hasThird: 'N',
+              url: 'setting/role',
+              menus: null
+            }, {
+              menuid: 82,
+              icon: 'icon-news-manage',
+              menuname: '用户管理',
+              hasThird: 'N',
+              url: 'setting/user',
+              menus: null
+            }
+          ]
+        },
+      ],
       RoleRightProps: {
-        children: 'children',
-        label: 'name'
+        children: 'menus',
+        label: 'menuname'
       },
       // 选中
       checkmenu: [],
@@ -173,137 +325,72 @@ export default {
     // 获取角色列表
     getdata(parameter) {
       // 模拟数据
-      let res = {
-        code: 0,
-        msg: null,
-        count: 6,
-        data: [
-          {
-            addUser: 'root',
-            editUser: 'root',
-            addTime: 1519182004000,
-            editTime: 1520288426000,
-            roleId: 1,
-            systemNo: 'pmd',
-            roleNo: 'Administrator',
-            roleName: '超级管理员'
-          },
-          {
-            addUser: null,
-            editUser: null,
-            addTime: 1521111376000,
-            editTime: 1520678191000,
-            roleId: 2,
-            systemNo: 'order',
-            roleNo: 'admin',
-            roleName: '公司管理员'
-          },
-          {
-            addUser: null,
-            editUser: null,
-            addTime: 1520678221000,
-            editTime: 1520678221000,
-            roleId: 95,
-            systemNo: 'pm',
-            roleNo: 'common',
-            roleName: '普通用户'
-          },
-          {
-            addUser: null,
-            editUser: null,
-            addTime: 1526349853000,
-            editTime: 1526349853000,
-            roleId: 96,
-            systemNo: '1',
-            roleNo: '1',
-            roleName: '1'
-          },
-          {
-            addUser: null,
-            editUser: null,
-            addTime: 1526349942000,
-            editTime: 1526437443000,
-            roleId: 97,
-            systemNo: '2',
-            roleNo: '2',
-            roleName: '2'
-          },
-          {
-            addUser: null,
-            editUser: null,
-            addTime: 1526652148000,
-            editTime: 1526652148000,
-            roleId: 101,
-            systemNo: 'test',
-            roleNo: 'demo',
-            roleName: '演示角色'
-          }
-        ]
-      }
       this.loading = false
-      this.listData = res.data
-      // 分页赋值
-      this.pageparm.currentPage = this.formInline.page
-      this.pageparm.pageSize = this.formInline.limit
-      this.pageparm.total = res.count
+
       // 模拟数据结束
 
       /***
        * 调用接口，注释上面模拟数据 取消下面注释
        */
-      // roleList(parameter)
-      //   .then(res => {
-      //     this.loading = false
-      //     if (res.success == false) {
-      //       this.$message({
-      //         type: 'info',
-      //         message: res.msg
-      //       })
-      //     } else {
-      //       this.listData = res.data
-      //       // 分页赋值
-      //       this.pageparm.currentPage = this.formInline.page
-      //       this.pageparm.pageSize = this.formInline.limit
-      //       this.pageparm.total = res.count
-      //     }
-      //   })
-      //   .catch(err => {
-      //     this.loading = false
-      //     this.$message.error('获取角色列表失败，请稍后再试！')
-      //   })
+       getRolePage(parameter)
+        .then(res => {
+          this.loading = false
+          if (res.success == false) {
+            this.$message({
+              type: 'info',
+              message: res.msg
+            })
+          } else {
+            this.listData = res.data.items
+            // 分页赋值
+            this.pageparm.currentPage = this.formInline.pageNo
+            this.pageparm.pageSize = this.formInline.pageSize
+            this.pageparm.total = res.data.totalNum
+          }
+        })
+        .catch(err => {
+          this.loading = false
+          this.$message.error('获取角色列表失败，请稍后再试！')
+        })
     },
     // 分页插件事件
     callFather(parm) {
-      this.formInline.page = parm.currentPage
-      this.formInline.limit = parm.pageSize
+      this.formInline.pageNo = parm.currentPage
+      this.formInline.pageSize = parm.pageSize
       this.getdata(this.formInline)
     },
     // 搜索事件
     search() {
       this.getdata(this.formInline)
     },
+    //显示页面权限编辑页面
+    menuAccess: function(index,row) {
+      this.menuAccessshow = true
+      this.saveroleId = row.id
+    },
     //显示编辑界面
     handleEdit: function(index, row) {
       this.editFormVisible = true
       if (row != undefined && row != 'undefined') {
         this.title = '修改'
-        this.editForm.roleId = row.roleId
-        this.editForm.systemNo = row.systemNo
-        this.editForm.roleNo = row.roleNo
-        this.editForm.roleName = row.roleName
+        this.editForm.id = row.id
+        this.editForm.code = row.code
+        this.editForm.name = row.name
+        this.editForm.remark = row.remark
       } else {
         this.title = '添加'
-        this.editForm.roleId = ''
-        this.editForm.systemNo = ''
-        this.editForm.roleNo = ''
-        this.editForm.roleName = ''
+        this.editForm.id = ''
+        this.editForm.code = ''
+        this.editForm.name = ''
+        this.editForm.remark = ''
       }
     },
     // 编辑、增加页面保存方法
     submitForm(editData) {
       this.$refs[editData].validate(valid => {
         if (valid) {
-          roleSave(this.editForm)
+         if(this.editForm.id) {
+          updateRole(this.editForm)
             .then(res => {
               this.editFormVisible = false
               this.loading = false
@@ -325,6 +412,30 @@ export default {
               this.loading = false
               this.$message.error('角色保存失败，请稍后再试！')
             })
+         }else {
+          createRole(this.editForm)
+            .then(res => {
+              this.editFormVisible = false
+              this.loading = false
+              if (res.success) {
+                this.getdata(this.formInline)
+                this.$message({
+                  type: 'success',
+                  message: '角色保存成功！'
+                })
+              } else {
+                this.$message({
+                  type: 'info',
+                  message: res.msg
+                })
+              }
+            })
+            .catch(err => {
+              this.editFormVisible = false
+              this.loading = false
+              this.$message.error('角色保存失败，请稍后再试！')
+            })
+         }
         } else {
           return false
         }
@@ -338,7 +449,7 @@ export default {
         type: 'warning'
       })
         .then(() => {
-          roleDelete(row.roleId)
+          roleDelete(row.id)
             .then(res => {
               if (res.success) {
                 this.$message({
@@ -363,31 +474,6 @@ export default {
             type: 'info',
             message: '已取消删除'
           })
-        })
-    },
-    // 数据权限
-    menuAccess: function(index, row) {
-      this.menuAccessshow = true
-      this.saveroleId = row.roleId
-      RoleRightTree(row.roleId)
-        .then(res => {
-          if (res.data.success) {
-            this.$message({
-              type: 'success',
-              message: '获取权限成功'
-            })
-            this.changemenu(res.data.data)
-            this.RoleRight = this.changeArr(res.data.data)
-          } else {
-            this.$message({
-              type: 'info',
-              message: res.data.msg
-            })
-          }
-        })
-        .catch(err => {
-          this.loading = false
-          this.$message.error('获取权限失败，请稍后再试！')
         })
     },
     // 选中菜单
@@ -444,7 +530,7 @@ export default {
     // 菜单权限-保存
     menuPermSave() {
       let parm = {
-        roleId: this.saveroleId,
+        id: this.saveroleId,
         moduleIds: ''
       }
       let node = this.$refs.tree.getCheckedNodes()

@@ -98,4 +98,25 @@ export const updatePayment = (params) => { return req("POST", "/broadband/manage
 export const getAnalysisCount = () => { return req("GET", "/broadband/manage/analysis/count") };
 export const getAnalysisCountQuery = (params) => { return req("POST", "/broadband/manage/analysis/query",params) };
 
-//
+//分销
+export const pageTeamUser = (params) => { return req("POST", "/broadband/manage/client/user/pageTeamUser", params) };
+
+//管理端用户管理查询
+export const pageSysUser = (params) => { return req("POST", "/broadband/manage/user/page", params) };
+//管理员添加
+export const sysUserAddd = (params) => { return req("POST", "/broadband/manage/user/add", params) };
+//管理端用户禁用
+export const sysUserDisable = (params) => { return req("get", "/broadband/manage/user/disable?id="+params.id, params) };
+//管理端用户启用
+export const sysUserEnable = (params) => { return req("get", "/broadband/manage/user/enable?id="+params.id, params) };
+//管理端用户重置密码
+export const sysUserRefreshPassword = (params) => { return req("get", "/broadband/manage/user/resetPwd?id="+params.id, params) };
+//管理员修改密码
+export const sysUserUpdate = (params) => { return req("POST", "/broadband/manage/user/updatePassword", params) };
+
+//获取角色菜单
+export const getRolePage = (params) => { return req("POST", "/broadband/manage/role/page", params) };
+//创建角色
+export const createRole = (params) => { return req("POST", "/broadband/manage/role/create", params) };
+//修改角色
+export const updateRole = (params) => { return req("POST", "/broadband/manage/role/update", params) };

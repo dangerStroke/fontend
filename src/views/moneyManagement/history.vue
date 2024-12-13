@@ -73,7 +73,7 @@
           <span v-if="scope.row.status == -1">驳回</span>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="操作" min-width="300">
+      <el-table-column align="center" label="操作" min-width="200" fixed="right">
         <template slot-scope="scope">
           <el-button size="mini" type="primary" @click="handleEdit(scope.$index, scope.row, 1)" v-if="scope.row.status == 0">同意</el-button>
           <el-button size="mini"  type="danger" @click="handleEdit(scope.$index, scope.row, 0)" v-if="scope.row.status == 0">驳回</el-button>

@@ -36,7 +36,7 @@
       </el-table-column>
       <el-table-column sortable prop="editUser" label="修改人" width="300">
       </el-table-column>
-      <el-table-column align="center" label="操作" min-width="300">
+      <el-table-column align="center" label="操作" min-width="200" fixed="right">
         <template slot-scope="scope">
           <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
           <el-button size="mini" type="danger" @click="deleteUser(scope.$index, scope.row)">删除</el-button>
@@ -88,8 +88,8 @@ export default {
         deptNo: [{ required: true, message: '请输入部门代码', trigger: 'blur' }]
       },
       formInline: {
-        page: 1,
-        limit: 10,
+        pageNo: 1,
+        pageSize: 10,
         varLable: '',
         varName: '',
         token: localStorage.getItem('logintoken')
@@ -144,11 +144,11 @@ export default {
               message: res.msg
             })
           } else {
-            this.listData = res.data.data
+            this.listData = res.data.items
             // 分页赋值
-            this.pageparm.currentPage = this.formInline.page
-            this.pageparm.pageSize = this.formInline.limit
-            this.pageparm.total = res.data.items
+            this.pageparm.currentPage = this.formInline.pageNo
+            this.pageparm.pageSize = this.formInline.pageSize
+            this.pageparm.total = res.data.totalNum
           }
         })
         .catch(err => {
@@ -158,8 +158,8 @@ export default {
     },
     // 分页插件事件
     callFather(parm) {
-      this.formInline.page = parm.currentPage
-      this.formInline.limit = parm.pageSize
+      this.formInline.pageNo = parm.currentPage
+      this.formInline.pageSize = parm.pageSize
       this.getdata(this.formInline)
     },
     // 搜索事件
