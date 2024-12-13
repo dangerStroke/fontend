@@ -167,7 +167,17 @@ export default {
               menuname: '轮播图管理',
               hasThird: 'N',
               url: 'operationManagement/swiper',
-              menus: null
+              menus: [
+                {
+                  parentId:51,
+                  menuid: 511,
+                  icon: 'el-icon-picture',
+                  menuname: '轮播图管理1',
+                  hasThird: 'N',
+                  url: 'operationManagement/swiper',
+                  menus:null
+                }
+              ]
             },
             {
               parentId:5,
@@ -301,8 +311,11 @@ export default {
       },
       // 选中
       checkmenu: [],
-      //参数role
-      saveroleId: '',
+      //修改role的参数
+      roleForm: {
+        id:'',
+        menuJson:[]
+      },
       // 分页参数
       pageparm: {
         currentPage: 1,
@@ -378,7 +391,7 @@ export default {
     //显示页面权限编辑页面
     menuAccess: function(index,row) {
       this.menuAccessshow = true
-      this.saveroleId = row.id
+      this.roleForm.id = row.id
     },
     //显示编辑界面
     handleEdit: function(index, row) {
@@ -488,61 +501,50 @@ export default {
           })
         })
     },
-    // 选中菜单
-    changemenu(arr) {
-      let change = []
-      for (let i = 0; i < arr.length; i++) {
-        if (arr[i].checked) {
-          change.push(arr[i].id)
-        }
-      }
-      this.checkmenu = change
-    },
     
-    buildCheckedTree(treeData, checkedKeys) {
-      return treeData.reduce((acc, node) => {
-        if (checkedKeys.includes(node.menuid)) {
-          console.log(node)
-          const newNode = {...node};
-          if (node.menus) {
-            console.log(node)
-            // newNode.menus = this.buildCheckedTree(node.menus, checkedKeys);
+    buildCheckedTree(items) { 
+      const rootItems = [];
+      const lookup = {};
+      for (const item of items) {
+          const itemId = item.menuid;
+          const parentId = item.parentId;
+          if (!lookup[itemId]) lookup[itemId] = { [itemId]: item, menus: [] };
+
+          lookup[itemId] = { ...item, menus: lookup[itemId].menus };
+          if (parentId === null || parentId === undefined) {
+            rootItems.push(lookup[itemId]);
+          } else {
+            if (!lookup[parentId]) lookup[parentId] = { [parentId]: {}, menus: [] };
+            lookup[parentId].menus.push(lookup[itemId]);
           }
-          acc.push(newNode);
-        }
-        return acc;
-      }, []);
+      }
+      return rootItems;
     },
     // 菜单权限-保存
     menuPermSave() {
-      let param = {
-        id: this.saveroleId,
-        menuJson:[]
-      }
-      let node = this.$refs.tree.getCheckedNodes()
-      const checkedKeys = node.map(node => node.menuid);
-      param.menuJson = this.buildCheckedTree(this.RoleRight, checkedKeys);
-      console.log(param.menuJson)
-      // updateRoleMenus(param)
-      //   .then(res => {
-      //     if (res.success) {
-      //       this.$message({
-      //         type: 'success',
-      //         message: '权限保存成功'
-      //       })
-      //       this.menuAccessshow = false
-      //       this.getdata(this.formInline)
-      //     } else {
-      //       this.$message({
-      //         type: 'info',
-      //         message: res.msg
-      //       })
-      //     }
-      //   })
-      //   .catch(err => {
-      //     this.loading = false
-      //     this.$message.error('权限保存失败，请稍后再试！')
-      //   })
+    
+      let checkedNodes = this.$refs.tree.getCheckedNodes(false,true)
+      this.roleForm.menuJson = JSON.stringify(this.buildCheckedTree(checkedNodes))
+      updateRoleMenus(param)
+        .then(res => {
+          if (res.success) {
+            this.$message({
+              type: 'success',
+              message: '权限保存成功'
+            })
+            this.menuAccessshow = false
+            this.getdata(this.formInline)
+          } else {
+            this.$message({
+              type: 'info',
+              message: res.msg
+            })
+          }
+        })
+        .catch(err => {
+          this.loading = false
+          this.$message.error('权限保存失败，请稍后再试！')
+        })
     },
     // 关闭编辑、增加弹出框
     closeDialog(dialog) {
@@ -550,6 +552,7 @@ export default {
         this.editFormVisible = false
       } else if (dialog == 'perm') {
         this.menuAccessshow = false
+        this.$refs.tree.setCheckedNodes([])
       }
     }
   }
