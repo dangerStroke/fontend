@@ -9,7 +9,7 @@
       <el-breadcrumb-item>收款账号设置</el-breadcrumb-item>
     </el-breadcrumb>
     <!--列表-->
-    <el-table size="small" :data="listData" highlight-current-row v-loading="loading" border element-loading-text="拼命加载中" style="width: 100%;">
+    <el-table size="small" :data="listData" highlight-current-row v-loading="loading" border element-loading-text="拼命加载中" style="width: 100%;margin-top: 30px;">
       <el-table-column align="center" prop="alipayUsername" label="支付宝收款人姓名" width="150">
       </el-table-column>
       <el-table-column align="center" prop="alipayAccount" label="支付宝收款账号" width="200">

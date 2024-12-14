@@ -14,7 +14,7 @@
         <el-input size="small" clearable v-model="formInline.username" placeholder="输入用户名称"></el-input>
       </el-form-item>
       <el-form-item label="手机号">
-        <el-input size="small" clearable v-model="formInline.userCode" placeholder="输入用户账号"></el-input>
+        <el-input size="small" clearable v-model="formInline.phone" placeholder="输入手机号"></el-input>
       </el-form-item>
       <el-form-item label="订单状态">
         <el-select clearable v-model="formInline.status" placeholder="请选择订单状态">
@@ -44,9 +44,9 @@
       </el-table-column>
       <el-table-column align="center" prop="phone" label="用户手机号" width="150">
       </el-table-column>
-      <el-table-column align="center" prop="" label="密码" width="150">
-      </el-table-column>
-      <el-table-column align="center" prop="" label="角色" width="120">
+      <!-- <el-table-column align="center" prop="" label="密码" width="150">
+      </el-table-column> -->
+      <el-table-column align="center" prop="ruleName" label="角色" width="120">
       </el-table-column>
       <el-table-column align="center" prop="status" label="状态" width="120">
         <template slot-scope="scope">
@@ -62,7 +62,6 @@
           <el-button size="mini" type="warning" @click="handleActive(scope.$index, scope.row)" v-if="scope.row.status == 0">禁用</el-button>
           <el-button size="mini" type="primary" @click="handleActive(scope.$index, scope.row)" v-if="scope.row.status == -1">启用</el-button>
           <el-button size="mini" type="danger" @click="refreshPassword(scope.$index, scope.row)">重置密码</el-button>
-          <!-- <el-button size="mini" type="danger" @click="deleteUser(scope.$index, scope.row)">删除</el-button> -->
         </template>
       </el-table-column>
     </el-table>
@@ -71,7 +70,7 @@
     <!-- 修改界面 -->
     <el-dialog :title="title" :visible.sync="editFormVisible" width="50%" @click="closeDialog">
       <el-row :gutter="20">
-        <el-col :span="10">
+        <el-col :span="20">
           <el-form label-width="120px" :model="editForm" :rules="rules" ref="editForm">
             <el-form-item label="用户名称" prop="username">
               <el-input size="small" :disabled="editForm.userId != ''" v-model="editForm.username" auto-complete="off" ></el-input>
@@ -82,19 +81,21 @@
             <el-form-item label="用户手机号" prop="phone">
               <el-input size="small" :disabled="editForm.userId != ''" v-model="editForm.phone" auto-complete="off" ></el-input>
             </el-form-item>
-            <el-form-item label="用户密码" prop="password">
+            <el-form-item label="用户密码" prop="password" v-if="editForm.userId == ''">
               <el-input size="small" v-model="editForm.password" auto-complete="off" ></el-input>
             </el-form-item>
-            <el-form-item label="用户角色" prop="password">
-              <el-input size="small" v-model="editForm.password" auto-complete="off" ></el-input>
+            <el-form-item label="用户角色" prop="roleCode" v-if="editForm.userId != ''">
+              <el-select clearable v-model="editForm.roleCode" placeholder="请选择用户角色">
+                <el-option
+                  v-for="item in roleListOption"
+                  :key="item.value"
+                  :label="item.name"
+                  :value="item.code">
+                </el-option>
+              </el-select>
             </el-form-item>
           </el-form>
         </el-col>
-        <!-- <el-col :span="10">
-          <el-form-item label="角色权限展示" prop="password">
-              
-          </el-form-item>
-        </el-col> -->
       </el-row>
       
       <div slot="footer" class="dialog-footer">
@@ -106,7 +107,7 @@
 </template>
 
 <script>
-import { pageSysUser, sysUserDisable, sysUserEnable, sysUserAddd, sysUserRefreshPassword, sysUserUpdate, sysRoleList } from '../../api/api'
+import { pageSysUserPage, sysUserDisable, sysUserEnable, sysUserAddd, sysUserRefreshPassword, sysUserUpdatePassWord, sysRoleList, updateUserRoles } from '../../api/api'
 import Pagination from '../../components/Pagination'
 export default {
   data() {
@@ -131,22 +132,24 @@ export default {
         username:'',
         userCode:'',
         phone:'',
-        userId:''
+        userId:'',
+        roleCode:''
       },
       // rules表单验证
       rules: {
         username: [
           { required: true, message: '请输入用户名称', trigger: 'blur' }
         ],
-        password: [{ required: true, message: '请输入初始密码', trigger: 'blur' }],
+        password: [{ required: true, message: '请输入新密码', trigger: 'blur' }],
         userCode: [{ required: true, message: '请输入用户账号', trigger: 'blur' }],
         phone: [{ required: true, message: '请输入用户手机号', trigger: 'blur' }],
+        roleCode: [{ required: true, message: '请选择角色', trigger: 'blur' }],
       },
       formInline: {
         pageNo: 1,
         pageSize: 10,
         username: '',
-        userCode: '',
+        phone: '',
         status:''
       },
       // 删除部门
@@ -186,11 +189,11 @@ export default {
   methods: {
     getRoleList() {
       this.loading = true
-      sysRoleList()
+      sysRoleList({name:''})
         .then(res => {
           this.loading = false
           if (res.code == 200) {
-            this.roleListOption = res.data.items
+            this.roleListOption = res.data
           }
         })
         .catch(err => {
@@ -205,7 +208,7 @@ export default {
       /***
        * 调用接口，注释上面模拟数据 取消下面注释
        */
-      pageSysUser(parameters)
+      pageSysUserPage(parameters)
         .then(res => {
           this.loading = false
           if (res.success == false) {
@@ -248,11 +251,11 @@ export default {
         console.log(row)
         this.title = '修改用户信息'
         this.editForm.userId = row.id,
-
         this.editForm.password = row.password
         this.editForm.userCode = row.userCode
         this.editForm.username = row.username
         this.editForm.phone = row.phone
+        this.editForm.roleCode = row.ruleCode
       } else {
         this.title = '添加用户信息'
         this.editForm.userId = ""
@@ -260,14 +263,15 @@ export default {
         this.editForm.userCode = ''
         this.editForm.username = ''
         this.editForm.phone = ''
+        this.editForm.roleCode = ''
       }
     },
     // 编辑、增加页面保存方法
     submitForm(editData) {
       this.$refs[editData].validate(valid => {
         if (valid) {
-          if(this.editForm.userId) {
-            sysUserUpdate(this.editForm)
+          if(!this.editForm.userId) {
+            sysUserAddd({...this.editForm,password:this.editForm.password})
             .then(res => {
               this.editFormVisible = false
               this.loading = false
@@ -289,13 +293,15 @@ export default {
               this.loading = false
               this.$message.error('保存失败，请稍后再试！')
             })
-          }else {
-            sysUserAddd(this.editForm)
+          }else{
+            updateUserRoles({
+              userId:this.editForm.userId,
+              roleCode:this.editForm.roleCode
+            })
             .then(res => {
               this.editFormVisible = false
               this.loading = false
               if (res.success) {
-                this.getdata(this.formInline)
                 this.$message({
                   type: 'success',
                   message: '保存成功！'
@@ -313,6 +319,7 @@ export default {
               this.$message.error('保存失败，请稍后再试！')
             })
           }
+          
         } else {
           return false
         }
@@ -360,7 +367,7 @@ export default {
         if(res.code == 200) {
           this.$message({
             type: 'success',
-            message: '重置密码成功！'
+            message: '重置密码成功！初始密码为：000000'
           })
         }else{
           this.$message.error(res.msg)

@@ -102,7 +102,7 @@ export const getAnalysisCountQuery = (params) => { return req("POST", "/broadban
 export const pageTeamUser = (params) => { return req("POST", "/broadband/manage/client/user/pageTeamUser", params) };
 
 //管理端用户管理查询
-export const pageSysUser = (params) => { return req("POST", "/broadband/manage/user/page", params) };
+export const pageSysUserPage = (params) => { return req("POST", "/broadband/manage/user/page", params) };
 //管理员添加
 export const sysUserAddd = (params) => { return req("POST", "/broadband/manage/user/add", params) };
 //管理端用户禁用
@@ -112,9 +112,13 @@ export const sysUserEnable = (params) => { return req("get", "/broadband/manage/
 //管理端用户重置密码
 export const sysUserRefreshPassword = (params) => { return req("get", "/broadband/manage/user/resetPwd?id="+params.id, params) };
 //管理员修改密码
-export const sysUserUpdate = (params) => { return req("POST", "/broadband/manage/user/updatePassword", params) };
+export const sysUserUpdatePassWord = (params) => { return req("POST", "/broadband/manage/user/updatePassword", params) };
 //获取所有角色
 export const sysRoleList = (params) => { return req("POST", "/broadband/manage/role/list", params) };
+//管理端用户绑定角色
+export const updateUserRoles = (params) => { return req("POST", "/broadband/manage/user/saveUserRole", params) };
+//获取管理端用户详情
+export const getSysUserDetail = (params) => { return req("get", "/broadband/manage/user/get?id="+params.id, params) };
 
 //获取角色菜单
 export const getRolePage = (params) => { return req("POST", "/broadband/manage/role/page", params) };
@@ -123,4 +127,6 @@ export const createRole = (params) => { return req("POST", "/broadband/manage/ro
 //修改角色
 export const updateRole = (params) => { return req("POST", "/broadband/manage/role/update", params) };
 //修改角色权限
-export const updateRoleMenus = (params) => { return req("POST", "/broadband/manage/role/saveRoleMenus", params) };
+export const updateRoleMenus = (params) => { return req("POST", "/broadband/manage/role/update", params) };
+//获取权限页面树
+export const getRoleTree = (params) => { return req("get", "/broadband/manage/role/findByRoleCode?roleCode="+params.roleCode, params) };

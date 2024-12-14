@@ -9,7 +9,7 @@
       <el-breadcrumb-item>数据分析</el-breadcrumb-item>
     </el-breadcrumb>
 
-    <div class="out-border">
+    <div class="out-border" style="margin-top: 30px;">
       <el-row :gutter="20" class="custom-row">
         <el-col :span="4">
           <div>
@@ -211,7 +211,6 @@ export default {
   methods: {
     getCount() {
       getAnalysisCount().then((res) => {
-        console.log("getAnalysisCount", res);
         this.countInfo = res.data;
       });
     },
@@ -266,9 +265,11 @@ export default {
   font-size: 14px;
   margin-bottom: 8px;
   font-weight: bold;
+  text-align: center;
 }
 .maring-btm-8 {
   margin-bottom: 8px;
+  text-align: center;
 }
 .user-search {
   margin-top: 20px;

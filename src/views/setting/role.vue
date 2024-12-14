@@ -51,7 +51,7 @@
           <el-input size="small" v-model="editForm.name" auto-complete="off" placeholder="请输入角色名称"></el-input>
         </el-form-item>
         <el-form-item label="角色代码" prop="code">
-          <el-input size="small" v-model="editForm.code" auto-complete="off" placeholder="请输入角色代码"></el-input>
+          <el-input size="small" :disabled="editForm.id != ''" v-model="editForm.code" auto-complete="off" placeholder="请输入角色代码"></el-input>
         </el-form-item>
         <el-form-item label="备注" prop="code">
           <el-input size="small" v-model="editForm.remark" auto-complete="off" placeholder="请输入角色代码"></el-input>
@@ -313,8 +313,11 @@ export default {
       checkmenu: [],
       //修改role的参数
       roleForm: {
-        id:'',
-        menuJson:[]
+        menuJson:[],
+        id: '',
+        code: '',
+        name: '',
+        remark: ''
       },
       // 分页参数
       pageparm: {
@@ -392,6 +395,9 @@ export default {
     menuAccess: function(index,row) {
       this.menuAccessshow = true
       this.roleForm.id = row.id
+      this.roleForm.code = row.code
+      this.roleForm.name = row.name
+      this.roleForm.remark = row.remark
     },
     //显示编辑界面
     handleEdit: function(index, row) {
@@ -525,7 +531,7 @@ export default {
     
       let checkedNodes = this.$refs.tree.getCheckedNodes(false,true)
       this.roleForm.menuJson = JSON.stringify(this.buildCheckedTree(checkedNodes))
-      updateRoleMenus(param)
+      updateRoleMenus(this.roleForm)
         .then(res => {
           if (res.success) {
             this.$message({

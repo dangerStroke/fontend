@@ -32,7 +32,7 @@
   </el-menu>
 </template>
 <script>
-import { menu } from '../api/userMG'
+import { getRoleTree } from '../api/api'
 export default {
   name: 'leftnav',
   data() {
@@ -211,12 +211,11 @@ export default {
       msg: 'success'
     }
     this.allmenu = res.data
-
-    // menu(localStorage.getItem('logintoken'))
+    // getRoleTree({roleCode:JSON.parse(localStorage.getItem('userdata')).ruleCode})
     //   .then(res => {
-    //     console.log(JSON.stringify(res))
+    //     console.log(res)
     //     if (res.success) {
-    //       this.allmenu = res.data
+    //       this.allmenu = res.data.menuJson
     //     } else {
     //       this.$message.error(res.msg)
     //       return false

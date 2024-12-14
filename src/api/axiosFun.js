@@ -9,7 +9,6 @@ import { Message } from 'element-ui';
 axios.interceptors.response.use(
     (response) => {
         // 对响应数据做点什么
-        console.log('Response Interceptor:', response);
         if(response.data.code != 200) {
             Message({
                 message: response.data.msg,

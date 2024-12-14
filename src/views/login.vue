@@ -16,7 +16,7 @@
   </div>
 </template>
 <script type="text/ecmascript-6">
-import { login } from '../api/api'
+import { login, getSysUserDetail } from '../api/api'
 import { setCookie, getCookie, delCookie } from '../utils/util'
 import md5 from 'js-md5'
 export default {
@@ -70,6 +70,7 @@ export default {
           // }, 1000)
           // 注释
           login(this.ruleForm).then(res => {
+            
             if (res.code == 200) {
               if (this.ruleForm.rememberMe) {
                 //保存帐号到cookie，有效期7天
@@ -80,22 +81,24 @@ export default {
                 delCookie('user')
                 delCookie('pwd')
               }
-              //如果请求成功就让他2秒跳转路由
-              setTimeout(() => {
-                this.logining = false
-                // 缓存token
-                console.log(res)
-                localStorage.setItem('logintoken', res.data.token)
-                // 缓存用户个人信息
-                localStorage.setItem('userdata', JSON.stringify(res.data.userVo))
-                this.$store.commit('login', 'true')
-                this.$router.push({ path: '/dataAnalysis/index' })
-              }, 1000)
+             // 缓存token
+             localStorage.setItem('logintoken', res.data.token)
+              getSysUserDetail({id:res.data.userVo.id}).then(item => {
+                //如果请求成功就让他2秒跳转路由
+                  setTimeout(() => {
+                    // 缓存用户个人信息
+                    localStorage.setItem('userdata', JSON.stringify(item.data))
+                    this.$store.commit('login', 'true')
+                    this.$router.push({ path: '/dataAnalysis/index' })
+                  }, 1000)
+              })
             } else {
               this.$message.error(res.msg)
               this.logining = false
               return false
             }
+          }).catch(err => {
+            this.logining = false
           })
         } else {
           this.$message.error('请输入用户名密码！')
