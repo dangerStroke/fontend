@@ -71,7 +71,7 @@
     <!-- 分页组件 -->
     <Pagination v-bind:child-msg="pageparm" @callFather="callFather"></Pagination>
     <!-- 编辑界面 -->
-    <el-dialog :title="title" :visible.sync="editFormVisible" width="30%" @click="closeDialog">
+    <el-dialog :title="title" :visible.sync="editFormVisible" width="30%" @close="closeDialog">
       <el-form label-width="120px" :model="editForm" :rules="rules" ref="editForm">
         <el-form-item label="" prop="result">
           <el-input type="textarea" size="small" clearable v-model="editForm.orderComment" placeholder="请填写备注"></el-input>

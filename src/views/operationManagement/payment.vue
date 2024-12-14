@@ -6,7 +6,7 @@
     <!-- 面包屑导航 -->
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-      <el-breadcrumb-item>收款账号设置</el-breadcrumb-item>
+      <el-breadcrumb-item>收款账号管理</el-breadcrumb-item>
     </el-breadcrumb>
     <!--列表-->
     <el-table size="small" :data="listData" highlight-current-row v-loading="loading" border element-loading-text="拼命加载中" style="width: 100%;margin-top: 30px;">
@@ -45,7 +45,7 @@
     <!-- 分页组件 -->
     <!-- <Pagination v-bind:child-msg="pageparm" @callFather="callFather"></Pagination> -->
     <!-- 编辑界面 -->
-    <el-dialog :title="title" :visible.sync="editFormVisible" width="50%" @click="closeDialog">
+    <el-dialog :title="title" :visible.sync="editFormVisible" width="50%" @close="closeDialog">
       <el-form label-width="150px" :model="editForm" :rules="rules" ref="editForm">
         <el-form-item label="支付宝收款人姓名" prop="alipayUsername">
           <el-input size="small" v-model="editForm.alipayUsername" auto-complete="off" placeholder="请输入支付宝收款人姓名"></el-input>

@@ -68,7 +68,7 @@
     <!-- 分页组件 -->
     <Pagination v-bind:child-msg="pageparm" @callFather="callFather"></Pagination>
     <!-- 修改界面 -->
-    <el-dialog :title="title" :visible.sync="editFormVisible" width="50%" @click="closeDialog">
+    <el-dialog :title="title" :visible.sync="editFormVisible" width="50%" @close="closeDialog">
       <el-row :gutter="20">
         <el-col :span="20">
           <el-form label-width="120px" :model="editForm" :rules="rules" ref="editForm">

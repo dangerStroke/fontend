@@ -91,7 +91,7 @@
     <!-- 分页组件 -->
     <Pagination v-bind:child-msg="pageparm" @callFather="callFather"></Pagination>
     <!-- 编辑界面 -->
-    <el-dialog :title="title" :visible.sync="editFormVisible" width="60%" @click="closeDialog">
+    <el-dialog :title="title" :visible.sync="editFormVisible" width="60%" @close="closeDialog">
       <el-form label-width="120px" :model="editForm" :rules="rules" ref="editForm">
             <el-form-item label="套餐名称" prop="comboName">
               <el-input size="small" v-model="editForm.comboName" auto-complete="off" placeholder="请输入套餐名称"></el-input>

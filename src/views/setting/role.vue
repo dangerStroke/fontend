@@ -45,7 +45,7 @@
     <!-- 分页组件 -->
     <Pagination v-bind:child-msg="pageparm" @callFather="callFather"></Pagination>
     <!-- 编辑界面 -->
-    <el-dialog :title="title" :visible.sync="editFormVisible" width="30%" @click='closeDialog("edit")'>
+    <el-dialog :title="title" :visible.sync="editFormVisible" width="30%" @close='closeDialog("edit")'>
       <el-form label-width="120px" :model="editForm" ref="editForm" :rules="rules">
         <el-form-item label="角色名称" prop="name">
           <el-input size="small" v-model="editForm.name" auto-complete="off" placeholder="请输入角色名称"></el-input>
@@ -63,7 +63,7 @@
       </div>
     </el-dialog>
     <!-- 菜单权限 -->
-    <el-dialog title="菜单权限" :visible.sync="menuAccessshow" width="30%" @click='closeDialog("perm")'>
+    <el-dialog title="菜单权限" :visible.sync="menuAccessshow" width="30%" @close='closeDialog("perm")'>
       <el-tree ref="tree" default-expand-all :data="RoleRight" :props="RoleRightProps" :default-checked-keys="checkmenu" node-key="menuid" show-checkbox>
       </el-tree>
       <div slot="footer" class="dialog-footer">
@@ -236,7 +236,7 @@ export default {
               parentId:5,
               menuid: 58,
               icon: 'icon-cat-skuQuery',
-              menuname: '收款账号设置',
+              menuname: '收款账号管理',
               hasThird: 'N',
               url: 'operationManagement/payment',
               menus: null
@@ -391,9 +391,24 @@ export default {
     search() {
       this.getdata(this.formInline)
     },
+    getRoleId(menuJson) {
+      menuJson.map(res => {
+        if(res.menus && res.menus.length) {
+          this.getRoleId(res.menus)
+        }else {
+          this.checkmenu.push(res.menuid)
+        }
+      })
+      this.$refs.tree.setCheckedKeys(this.checkmenu)
+    },
     //显示页面权限编辑页面
     menuAccess: function(index,row) {
       this.menuAccessshow = true
+      if(row.menuJson && row.menuJson.length) {
+        this.$nextTick(() => {
+          this.getRoleId(row.menuJson)
+        })
+      }
       this.roleForm.id = row.id
       this.roleForm.code = row.code
       this.roleForm.name = row.name
@@ -530,7 +545,12 @@ export default {
     menuPermSave() {
     
       let checkedNodes = this.$refs.tree.getCheckedNodes(false,true)
-      this.roleForm.menuJson = JSON.stringify(this.buildCheckedTree(checkedNodes))
+      this.roleForm.menuJson = this.buildCheckedTree(checkedNodes).map(res => {
+        if(res.menus.length == 0) {
+          res.menus = null
+        }
+        return res
+      })
       updateRoleMenus(this.roleForm)
         .then(res => {
           if (res.success) {
@@ -557,10 +577,11 @@ export default {
       if (dialog == 'edit') {
         this.editFormVisible = false
       } else if (dialog == 'perm') {
+        this.checkmenu = []
+        this.$refs.tree.setCheckedKeys([])
         this.menuAccessshow = false
-        this.$refs.tree.setCheckedNodes([])
       }
-    }
+    },
   }
 }
 </script>

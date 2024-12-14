@@ -64,9 +64,9 @@ export const supplierUpdate = (params) => { return req("post", "/broadband/manag
 //获取客服列表
 export const getWaiterPage =  (params) => { return req("post", "/broadband/manage/waiter/page", params) }
 //客服启用
-export const waiterDisable = (params) => { return req("GET", "/broadband/manage/waiter/disable?id="+params.id, params) };
+export const waiterDisable = (params) => { return req("post", "/broadband/manage/waiter/disable", params) };
 //客服禁用
-export const waiterEnable = (params) => { return req("GET", "/broadband/manage/waiter/enable?id="+params.id, params) };
+export const waiterEnable = (params) => { return req("POST", "/broadband/manage/waiter/enable", params) };
 //新增客服
 export const waiterAdd =  (params) => { return req("post", "/broadband/manage/waiter/add", params) }
 //更新客服

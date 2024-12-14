@@ -58,7 +58,7 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-dialog :title="title" :visible.sync="editFormVisible" width="60%" @click="closeDialog">
+    <el-dialog :title="title" :visible.sync="editFormVisible" width="60%" @close="closeDialog">
       <el-form :inline="true" :model="detailformInline" class="user-search">
       <el-form-item label="会员名称">
         <el-input size="small" clearable v-model="detailformInline.username" placeholder="输入会员名称"></el-input>

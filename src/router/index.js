@@ -29,7 +29,7 @@ import CustomerService from '@/views/operationManagement/customerService'
 import About from '@/views/operationManagement/about'
 //公告
 import Notice from '@/views/operationManagement/notice'
-//收款账号设置
+//收款账号管理
 import Payment from '@/views/operationManagement/payment'
 
 //提现申请
@@ -154,7 +154,7 @@ export default new Router({
             }
         }, {
             path: '/operationManagement/Payment',
-            name: '收款账号设置',
+            name: '收款账号管理',
             component: Payment,
             meta: {
                 requireAuth: true
