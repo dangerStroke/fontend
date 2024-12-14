@@ -143,7 +143,7 @@ export default {
             {
               menuid: 58,
               icon: 'icon-cat-skuQuery',
-              menuname: '收款账号设置',
+              menuname: '收款账号管理',
               hasThird: 'N',
               url: 'operationManagement/payment',
               menus: null
@@ -210,20 +210,19 @@ export default {
       ],
       msg: 'success'
     }
-    this.allmenu = res.data
-    // getRoleTree({roleCode:JSON.parse(localStorage.getItem('userdata')).ruleCode})
-    //   .then(res => {
-    //     console.log(res)
-    //     if (res.success) {
-    //       this.allmenu = res.data.menuJson
-    //     } else {
-    //       this.$message.error(res.msg)
-    //       return false
-    //     }
-    //   })
-    //   .catch(err => {
-    //     this.$message.error('菜单加载失败，请稍后再试！')
-    //   })
+    // this.allmenu = res.data
+    getRoleTree({roleCode:JSON.parse(localStorage.getItem('userdata')).ruleCode})
+      .then(res => {
+        if (res.success) {
+          this.allmenu = res.data.menuJson
+        } else {
+          this.$message.error(res.msg)
+          return false
+        }
+      })
+      .catch(err => {
+        this.$message.error('菜单加载失败，请稍后再试！')
+      })
     // 监听
     this.$root.Bus.$on('toggle', value => {
       this.collapsed = !value
