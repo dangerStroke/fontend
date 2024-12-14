@@ -44,7 +44,7 @@
       </el-form-item>
     </el-form>
     <!--列表-->
-    <el-table size="small" :data="listData" highlight-current-row v-loading="loading" border element-loading-text="拼命加载中" style="width: 100%;">
+    <el-table size="small" ref="myTable" :data="listData" highlight-current-row v-loading="loading" border element-loading-text="拼命加载中" style="width: 100%;">
       <el-table-column align="center" type="selection" width="60">
       </el-table-column>
       <el-table-column  prop="id" label="ID" width="100">
@@ -88,11 +88,17 @@
       </el-table-column>
       <el-table-column align="center" sortable prop="createTime" label="创建时间" width="100">
       </el-table-column>
+      <el-table-column align="center" sortable prop="status" label="状态" width="100">
+        <template slot-scope="scope">
+          <span v-if="scope.row.status == -1">禁用</span>
+          <span v-if="scope.row.status == 0">启用</span>
+        </template>
+      </el-table-column>
       <el-table-column align="center" label="操作" min-width="200" fixed="right">
         <template slot-scope="scope">
           <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-          <el-button size="mini" type="primary" @click="handleActive(scope.$index, scope.row, )" v-if="scope.row.state == -1">启用</el-button>
-          <el-button size="mini" type="warning" @click="handleActive(scope.$index, scope.row)" v-if="scope.row.state == 0">禁用</el-button>
+          <el-button size="mini" type="primary" @click="handleActive(scope.$index, scope.row )" v-if="scope.row.status == -1">启用</el-button>
+          <el-button size="mini" type="warning" @click="handleActive(scope.$index, scope.row)" v-if="scope.row.status == 0">禁用</el-button>
           <!-- <el-button size="mini" type="danger" @click="deleteUser(scope.$index, scope.row)">删除</el-button> -->
         </template>
       </el-table-column>
@@ -161,9 +167,9 @@ export default {
       // rules表单验证
       rules: {
         username: [
-          { required: true, message: '请输入部门名称', trigger: 'blur' }
+          { required: true, message: '请输入用户名称', trigger: 'blur' }
         ],
-        phone: [{ required: true, message: '请输入部门代码', trigger: 'blur' }],
+        phone: [{ required: true, message: '请输入用户代码', trigger: 'blur' }],
         // headImage: [{ required: true, message: '请上传头像', trigger: 'blur' }],
         // vipExpirationTime: [{ required: true, message: '请选择会员到期时间', trigger: 'blur' }],
         password: [{ required: true, message: '请输入初始密码', trigger: 'blur' }]
@@ -256,8 +262,12 @@ export default {
     },
     //显示编辑界面
     handleEdit: function(index, row) {
-      this.editFormVisible = true
-      if (row != undefined && row != 'undefined') {
+        if (row != undefined && row != 'undefined') {
+          if(row.status == 0) {
+          this.$message.info("启用状态下不可编辑")
+          return
+        }
+        this.editFormVisible = true
         console.log(row)
         this.title = '修改用户信息'
         this.editForm.userId = row.id,
@@ -267,6 +277,7 @@ export default {
         this.editForm.vipExpirationTime = row.vipExpirationTime
         this.editForm.password = row.password
       } else {
+        this.editFormVisible = true
         this.title = '添加用户信息'
         this.editForm.userId = ""
         this.editForm.headImage = ''
@@ -311,7 +322,7 @@ export default {
                 this.getdata(this.formInline)
                 this.$message({
                   type: 'success',
-                  message: '公司保存成功！'
+                  message: '保存成功！'
                 })
               } else {
                 this.$message({
@@ -323,7 +334,7 @@ export default {
             .catch(err => {
               this.editFormVisible = false
               this.loading = false
-              this.$message.error('公司保存失败，请稍后再试！')
+              this.$message.error('保存失败，请稍后再试！')
             })
           }else {
             userAdd(this.editForm)
@@ -334,7 +345,7 @@ export default {
                 this.getdata(this.formInline)
                 this.$message({
                   type: 'success',
-                  message: '公司保存成功！'
+                  message: '保存成功！'
                 })
               } else {
                 this.$message({
@@ -346,7 +357,7 @@ export default {
             .catch(err => {
               this.editFormVisible = false
               this.loading = false
-              this.$message.error('公司保存失败，请稍后再试！')
+              this.$message.error('保存失败，请稍后再试！')
             })
           }
         } else {
@@ -357,17 +368,19 @@ export default {
     //启用禁用
     handleActive: function(index, row) {
       //启用
-      if(row.state == 0) {
+      if(row.status == -1) {
         userEnable({id:row.id}).then(res => {
           if(res.code == 200) {
-            this.listData[index].state = 0
+            this.listData[index].status = 0
+            this.$message.success("启用成功")
             this.$refs.myTable.doLayout();
           }
         })
       }else{
         userDisable({id:row.id}).then(res => {
           if(res.code == 200) {
-            this.listData[index].state = -1
+            this.$message.success("禁用成功")
+            this.listData[index].status = -1
             this.$refs.myTable.doLayout();
           }
         })
@@ -386,7 +399,7 @@ export default {
               if (res.success) {
                 this.$message({
                   type: 'success',
-                  message: '公司已删除!'
+                  message: '已删除!'
                 })
                 this.getdata(this.formInline)
               } else {
@@ -398,7 +411,7 @@ export default {
             })
             .catch(err => {
               this.loading = false
-              this.$message.error('公司删除失败，请稍后再试！')
+              this.$message.error('删除失败，请稍后再试！')
             })
         })
         .catch(() => {

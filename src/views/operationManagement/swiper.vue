@@ -195,14 +195,19 @@ export default {
     },
     //显示编辑界面
     handleEdit: function(index, row) {
-      this.editFormVisible = true
       if (row != undefined && row != 'undefined') {
+        if(row.status == 1) {
+          this.$message.info("启用状态下不可编辑")
+          return
+        }
+        this.editFormVisible = true
         this.title = '修改轮播图'
         this.editForm.orderNum = row.orderNum
         this.editForm.title = row.title
         this.editForm.picUrl = row.picUrl
         this.editForm.id = row.id
       } else {
+        this.editFormVisible = true
         this.title = '添加轮播图'
         this.editForm.orderNum = ''
         this.editForm.title = ''
@@ -312,10 +317,10 @@ export default {
     },
     //启用禁用
     handleActive: function(index, row) {
-      //启用
       if(row.status == 0) {
         bannerEnable({id:row.id}).then(res => {
           if(res.code == 200) {
+            this.$message.success("启用成功")
             this.listData[index].status = 1
             this.$refs.myTable.doLayout();
           }
@@ -323,6 +328,7 @@ export default {
       }else{
         bannerDisable({id:row.id}).then(res => {
           if(res.code == 200) {
+            this.$message.success("禁用成功")
             this.listData[index].status = 0
             this.$refs.myTable.doLayout();
           }

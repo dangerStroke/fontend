@@ -246,8 +246,13 @@ export default {
     },
     //显示编辑界面
     handleEdit: function(index, row) {
-      this.editFormVisible = true
+
       if (row != undefined && row != 'undefined') {
+      if(row.status == 0) {
+        this.$message.info("启用状态下不可编辑")
+        return
+      }
+      this.editFormVisible = true
         console.log(row)
         this.title = '修改用户信息'
         this.editForm.userId = row.id,
@@ -257,6 +262,7 @@ export default {
         this.editForm.phone = row.phone
         this.editForm.roleCode = row.ruleCode
       } else {
+      this.editFormVisible = true
         this.title = '添加用户信息'
         this.editForm.userId = ""
         this.editForm.password = ''

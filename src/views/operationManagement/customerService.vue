@@ -220,8 +220,12 @@ export default {
     },
     //显示编辑界面
     handleEdit: function(index, row) {
-      this.editFormVisible = true
       if (row != undefined && row != 'undefined') {
+        if(row.status == 1) {
+          this.$message.info("启用状态下不可编辑")
+          return
+        }
+        this.editFormVisible = true
         this.title = '修改客服资料'
         this.editForm.phone = row.phone
         this.editForm.username = row.username
@@ -230,6 +234,10 @@ export default {
         this.editForm.status = row.status
         
       } else {
+        if(row.status == 1) {
+          this.$message.info("只有草稿和禁用状态下可编辑")
+          return
+        }
         this.title = '添加客服'
         this.editForm.phone = ''
         this.editForm.username = ''
@@ -345,6 +353,7 @@ export default {
           if(res.code == 200) {
             this.listData[index].status = 1
             this.$refs.myTable.doLayout();
+            this.$message.success("启用成功")
           }
         })
       }else{
@@ -352,6 +361,7 @@ export default {
           if(res.code == 200) {
             this.listData[index].status = 0
             this.$refs.myTable.doLayout();
+            this.$message.success("禁用成功")
           }
         })
       }

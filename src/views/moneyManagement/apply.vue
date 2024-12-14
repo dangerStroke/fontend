@@ -267,7 +267,7 @@ export default {
                 this.getdata(this.formInline)
                 this.$message({
                   type: 'success',
-                  message: '上传成功！'
+                  message: '保存成功！'
                 })
               } else {
                 this.$message({
