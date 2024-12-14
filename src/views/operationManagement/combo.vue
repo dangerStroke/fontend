@@ -84,7 +84,7 @@
           <el-button size="mini" type="info" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
           <el-button size="mini" type="primary" @click="handleActive(scope.$index, scope.row)" v-if="scope.row.status == 0 || scope.row.status == -1">启用</el-button>
           <el-button size="mini" type="warning" @click="handleActive(scope.$index, scope.row)" v-if="scope.row.status == 1 ">禁用</el-button>
-          <el-button size="mini" type="warning" @click="handleDraft(scope.$index, scope.row)" v-if="scope.row.status == -1 ">存为草稿</el-button>
+          <!-- <el-button size="mini" type="warning" @click="handleDraft(scope.$index, scope.row)" v-if="scope.row.status == -1 ">存为草稿</el-button> -->
         </template>
       </el-table-column>
     </el-table>
