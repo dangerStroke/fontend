@@ -312,8 +312,12 @@ export default {
     },
     //显示编辑界面
     handleEdit: function(index, row) {
-      this.editFormVisible = true
       if (row != undefined && row != 'undefined') {
+        if(row.status == 1) {
+          this.$message.info("只有草稿和禁用状态下可编辑")
+          return
+        }
+        this.editFormVisible = true
         this.title = '修改套餐'
         this.editForm.id = row.id
         this.editForm.comboName = row.comboName
@@ -327,6 +331,7 @@ export default {
         this.editForm.supplierCode = row.supplierCode
         
       } else {
+        this.editFormVisible = true
         this.title = '添加套餐'
         this.editForm.comboName = ''
         this.editForm.comboUrl = ''
@@ -357,7 +362,7 @@ export default {
                 this.getdata(this.formInline)
                 this.$message({
                   type: 'success',
-                  message: '公司保存成功！'
+                  message: '保存成功！'
                 })
               } else {
                 this.$message({
@@ -369,7 +374,7 @@ export default {
             .catch(err => {
               this.editFormVisible = false
               this.loading = false
-              this.$message.error('公司保存失败，请稍后再试！')
+              this.$message.error('保存失败，请稍后再试！')
             })
          }else {
           comboAdd(this.editForm)
@@ -380,7 +385,7 @@ export default {
                 this.getdata(this.formInline)
                 this.$message({
                   type: 'success',
-                  message: '公司保存成功！'
+                  message: '保存成功！'
                 })
               } else {
                 this.$message({
@@ -392,7 +397,7 @@ export default {
             .catch(err => {
               this.editFormVisible = false
               this.loading = false
-              this.$message.error('公司保存失败，请稍后再试！')
+              this.$message.error('保存失败，请稍后再试！')
             })
          }
         } else {
@@ -454,7 +459,7 @@ export default {
             .catch(err => {
               this.editFormVisible = false
               this.loading = false
-              this.$message.error('公司保存失败，请稍后再试！')
+              this.$message.error('保存失败，请稍后再试！')
             })
     },
     //上传图片
