@@ -36,12 +36,10 @@
       </el-form-item>
     </el-form>
     <!--列表-->
-    <el-table ref="myTable" size="small" :data="listData" highlight-current-row v-loading="loading" border element-loading-text="拼命加载中" style="width: 100%;">
+    <el-table ref="myTable" size="small" :data="listData" highlight-current-row v-loading="loading" border element-loading-text="拼命加载中" style="width: 100%;"  :row-class-name="tableRowClassName">
       <el-table-column align="center" type="selection" width="60">
       </el-table-column>
       <el-table-column align="center"  prop="orderNo" label="订单号" width="200">
-      </el-table-column>
-      <el-table-column align="center"  prop="orderStateName" label="订单状态" width="80">
       </el-table-column>
       <el-table-column align="center"  prop="username" label="联系人" width="100">
       </el-table-column>
@@ -60,6 +58,8 @@
       <el-table-column align="center" prop="" label="下单人手机号" width="120">
       </el-table-column>
       <el-table-column align="center" prop="createTime" label="创建时间" width="200">
+      </el-table-column>
+      <el-table-column align="center"  prop="orderStateName" label="订单状态" width="80">
       </el-table-column>
       <el-table-column align="center" label="操作" min-width="200" fixed="right">
         <template slot-scope="scope">
@@ -160,6 +160,17 @@ export default {
    * 里面的方法只有被调用才会执行
    */
   methods: {
+    tableRowClassName({row, rowIndex}) {
+      
+        if (row.orderState === -1) {
+          return 'fail-row';
+        } else if (row.orderState === 1) {
+          return 'success-row';
+        } else if(row.status === 0) {
+          return 'warning-row';
+        }
+        return '';
+      },
     // 获取公司列表
     getdata(parameter) {
       this.loading = true
@@ -297,6 +308,16 @@ export default {
     width: 178px;
     height: 178px;
     display: block;
+  }
+  .el-table .fail-row {
+    background: rgb(253, 237, 230);
+  }
+
+  .el-table .success-row {
+    background: #f0f9eb;
+  }
+  .el-table .warning-row {
+    background: rgb(253, 246, 230);
   }
 </style>
 

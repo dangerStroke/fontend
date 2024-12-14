@@ -4,7 +4,6 @@
 
 const path = require('path')
 const targetUrl = process.env
-console.log(process)
 module.exports = {
     dev: {
 

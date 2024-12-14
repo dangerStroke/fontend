@@ -38,7 +38,6 @@ axios.interceptors.response.use(
 
 // 登录请求方法
 const loginreq = (method, url, params) => {
-    console.log(params);
     return axios({
         method: method,
         url: url,

@@ -167,7 +167,6 @@ export default {
               message: res.msg
             })
           } else {
-            console.log(res)
             this.listData = [res.data]
             // 分页赋值
             this.pageparm.currentPage = this.formInline.pageNo

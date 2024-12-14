@@ -20,7 +20,7 @@
       </el-form-item>
     </el-form>
     <!--列表-->
-    <el-table ref="myTable" size="small" :data="listData" highlight-current-row v-loading="loading" border element-loading-text="拼命加载中" style="width: 100%;">
+    <el-table ref="myTable" size="small" :data="listData" highlight-current-row v-loading="loading" border element-loading-text="拼命加载中" style="width: 100%;" :row-class-name="tableRowClassName">
       <el-table-column align="center" type="selection" width="60">
       </el-table-column>
       <el-table-column align="center" sortable prop="orderNum" label="排序" width="200">
@@ -149,6 +149,15 @@ export default {
    * 里面的方法只有被调用才会执行
    */
   methods: {
+    tableRowClassName({row, rowIndex}) {
+      
+        if (row.status === 0) {
+          return 'fail-row';
+        } else if (row.status === 1) {
+          return 'success-row';
+        }
+        return '';
+      },
     // 获取公司列表
     getdata(parameter) {
       this.loading = true
@@ -378,6 +387,13 @@ export default {
     width: 178px;
     height: 178px;
     display: block;
+  }
+  .el-table .fail-row {
+    background: rgb(253, 237, 230);
+  }
+
+  .el-table .success-row {
+    background: #f0f9eb;
   }
 </style>
 

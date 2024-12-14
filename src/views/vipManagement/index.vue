@@ -6,7 +6,7 @@
     <!-- 面包屑导航 -->
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-      <el-breadcrumb-item>VIP申请管理</el-breadcrumb-item>
+      <el-breadcrumb-item>VIP管理</el-breadcrumb-item>
     </el-breadcrumb>
     <!-- 搜索筛选 -->
     <el-form :inline="true" :model="formInline" class="user-search">
@@ -43,7 +43,7 @@
       </el-form-item>
     </el-form>
     <!--列表-->
-    <el-table size="small" :data="listData" highlight-current-row v-loading="loading" border element-loading-text="拼命加载中" style="width: 100%;">
+    <el-table size="small" :data="listData" highlight-current-row v-loading="loading" border element-loading-text="拼命加载中" style="width: 100%;" :row-class-name="tableRowClassName">
       <el-table-column align="center" type="selection" width="60">
       </el-table-column>
       <el-table-column align="center" prop="username" label="申请人" width="200">
@@ -51,8 +51,6 @@
       <el-table-column align="center" prop="phone" label="手机号" width="150">
       </el-table-column>
       <el-table-column align="center" prop="amount" label="金额" width="100">
-      </el-table-column>
-      <el-table-column align="center" prop="applyCmnt" label="备注" width="200">
       </el-table-column>
       <el-table-column align="center" prop="transferUrl" label="付款截图" width="200">
         <template slot-scope="scope">
@@ -70,7 +68,10 @@
       </el-table-column>
       <el-table-column sortable prop="createTime" label="申请时间" width="300">
       </el-table-column>
-
+      <el-table-column align="center" prop="applyCmnt" label="申请备注" width="200">
+      </el-table-column>
+      <el-table-column align="center" prop="operationCmnt" label="操作备注" width="200">
+      </el-table-column>
       <el-table-column align="center" label="操作" min-width="200" fixed="right">
         <template slot-scope="scope">
           <el-button size="mini" type="primary" @click="handleEdit(scope.$index, scope.row, 1)" v-if="scope.row.status == 0">同意</el-button>
@@ -173,8 +174,16 @@ export default {
    * 里面的方法只有被调用才会执行
    */
   methods: {
+    tableRowClassName({row, rowIndex}) {
+      
+        if (row.status === -1) {
+          return 'fail-row';
+        } else if (row.status === 1) {
+          return 'success-row';
+        }
+        return '';
+      },
     getStatus(id) {
-      console.log(id)
       let text = ""
       this.statusList.forEach(res => {
         if(res.value == id) {
@@ -350,6 +359,13 @@ export default {
 .userRole {
   width: 100%;
 }
+.el-table .fail-row {
+    background: rgb(253, 237, 230);
+  }
+
+  .el-table .success-row {
+    background: #f0f9eb;
+  }
 </style>
 
  

@@ -40,7 +40,7 @@
       </el-form-item>
     </el-form>
     <!--列表-->
-    <el-table ref="myTable" size="small" :data="listData" highlight-current-row v-loading="loading" border element-loading-text="拼命加载中" style="width: 100%;">
+    <el-table ref="myTable" size="small" :data="listData" highlight-current-row v-loading="loading" border element-loading-text="拼命加载中" style="width: 100%;" :row-class-name="tableRowClassName">
       <el-table-column align="center" prop="comboName" label="套餐名称" width="100">
       </el-table-column>
       <el-table-column align="center" prop="comboType" label="套餐类型" width="100">
@@ -266,6 +266,17 @@ export default {
    * 里面的方法只有被调用才会执行
    */
   methods: {
+    tableRowClassName({row, rowIndex}) {
+      
+        if (row.status === -1) {
+          return 'fail-row';
+        } else if (row.status === 1) {
+          return 'success-row';
+        } else if(row.status == 0) {
+          return 'warning-row'
+        }
+        return '';
+      },
     // 获取列表
     getdata(parameter) {
       this.loading = true
@@ -317,6 +328,7 @@ export default {
           this.$message.info("只有草稿和禁用状态下可编辑")
           return
         }
+        
         this.editFormVisible = true
         this.title = '修改套餐'
         this.editForm.id = row.id
@@ -354,6 +366,7 @@ export default {
             }
           })
          if(this.editForm.id) {
+          
           comboUpdate(this.editForm)
             .then(res => {
               this.editFormVisible = false
@@ -438,7 +451,18 @@ export default {
     },
     //存为草稿
     handleDraft(index, row) {
-      comboUpdate({id:row.id, status:0})
+      this.editForm.id = row.id
+      this.editForm.comboName = row.comboName
+      this.editForm.comboUrl = row.comboUrl
+      this.editForm.comboDescr = row.comboDescr
+      this.editForm.sellingPoint = row.sellingPoint
+      this.editForm.kickback = row.kickback
+      this.editForm.shareKickback = row.shareKickback
+      this.editForm.comboType = row.comboType
+      this.editForm.vipKickback = row.vipKickback
+      this.editForm.supplierCode = row.supplierCode
+      this.editForm.status = 0
+      comboUpdate(this.editForm)
             .then(res => {
               this.editFormVisible = false
               this.loading = false
@@ -504,6 +528,16 @@ export default {
     width: 178px;
     height: 178px;
     display: block;
+  }
+  .el-table .fail-row {
+    background: rgb(253, 237, 230);
+  }
+
+  .el-table .success-row {
+    background: #f0f9eb;
+  }
+  .el-table .warning-row {
+    background: rgb(253, 246, 230);
   }
 </style>
  
