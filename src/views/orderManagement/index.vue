@@ -65,6 +65,7 @@
         <template slot-scope="scope">
           <el-button size="mini" type="primary" @click="handleEdit(scope.$index, scope.row, 1)" v-if="scope.row.orderState == 0">同意</el-button>
           <el-button size="mini"  type="danger" @click="handleEdit(scope.$index, scope.row, 0)" v-if="scope.row.orderState == 0">拒绝</el-button>
+          <el-button size="mini"  @click="handleEdit(scope.$index, scope.row, 0)" v-if="scope.row.orderState == 1 || scope.row.orderState == -1">撤销</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -73,7 +74,7 @@
     <!-- 编辑界面 -->
     <el-dialog :title="title" :visible.sync="editFormVisible" width="30%" @close="closeDialog">
       <el-form label-width="120px" :model="editForm" :rules="rules" ref="editForm">
-        <el-form-item label="" prop="result">
+        <el-form-item label="备注" prop="result">
           <el-input type="textarea" size="small" clearable v-model="editForm.orderComment" placeholder="请填写备注"></el-input>
         </el-form-item>
       </el-form>

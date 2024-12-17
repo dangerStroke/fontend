@@ -344,6 +344,10 @@ export default {
     handleActive: function(index, row) {
       //启用
       if(row.status == -1) {
+        if(!row.roleCode) {
+          this.$message.error('请先编辑用户权限')
+          return
+        }
         sysUserEnable({id:row.id}).then(res => {
           if(res.code == 200) {
             this.$message({

@@ -273,11 +273,10 @@ export default {
     handleEdit: function(index, row) {
         if (row != undefined && row != 'undefined') {
           if(row.status == 0) {
-          this.$message.info("启用状态下不可编辑")
-          return
-        }
+            this.$message.info("启用状态下不可编辑")
+            return
+          }
         this.editFormVisible = true
-        
         this.title = '修改用户信息'
         this.editForm.userId = row.id,
         this.editForm.headImage = row.headImage

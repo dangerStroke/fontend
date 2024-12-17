@@ -68,6 +68,8 @@
       </el-table-column>
       <el-table-column sortable prop="createTime" label="申请时间" width="300">
       </el-table-column>
+      <el-table-column sortable prop="vipExpirationTime" label="VIP到期时间" width="300">
+      </el-table-column>
       <el-table-column align="center" prop="applyCmnt" label="申请备注" width="200">
       </el-table-column>
       <el-table-column align="center" prop="operationCmnt" label="操作备注" width="200">
@@ -84,6 +86,14 @@
     <!-- 编辑界面 -->
     <el-dialog :title="title" :visible.sync="editFormVisible" width="30%" @click="closeDialog">
       <el-form label-width="120px" :model="editForm" :rules="rules" ref="editForm">
+        <el-form-item label="会员到期时间" prop="newVipExpirationTime" v-if="activeType == 1">
+          <el-date-picker
+            v-model="editForm.newVipExpirationTime"
+            value-format="yyyy-MM-dd"
+            type="date"
+            placeholder="会员到期时间">
+          </el-date-picker>
+        </el-form-item>
         <el-form-item label="理由" prop="operationCmnt">
           <el-input type="textarea" size="small" v-model="editForm.operationCmnt" auto-complete="off" placeholder="请输入理由"></el-input>
         </el-form-item>
@@ -111,14 +121,16 @@ export default {
       title: '添加',
       editForm: {
         id:'',
-        operationCmnt:''
+        operationCmnt:'',
+        newVipExpirationTime:''
       },
+      activeType:'',
       // rules表单验证
       rules: {
-        username: [
-          { required: true, message: '请输入部门名称', trigger: 'blur' }
+        operationCmnt: [
+          { required: true, message: '请填写理由', trigger: 'blur' }
         ],
-        phone: [{ required: true, message: '请输入部门代码', trigger: 'blur' }]
+        newVipExpirationTime: [{ required: true, message: '请选择VIP到期时间', trigger: 'blur' }]
       },
       formInline: {
         pageNo: 1,
@@ -239,9 +251,10 @@ export default {
     },  
     //显示编辑界面
     handleEdit: function(index, row, type) {
-       this.editForm.id = ""
-        this.editForm.type = ""
-        this.editForm.operationCmnt = ''
+      this.activeType = type
+      this.editForm.id = ""
+      this.editForm.type = ""
+      this.editForm.operationCmnt = ''
       this.editFormVisible = true
       if (type == 1) {
         this.title = '同意申请'
@@ -266,7 +279,7 @@ export default {
                 this.getdata(this.formInline)
                 this.$message({
                   type: 'success',
-                  message: '修改保存成功！'
+                  message: '保存成功！'
                 })
               } else {
                 this.$message({
