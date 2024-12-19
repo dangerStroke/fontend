@@ -27,8 +27,10 @@
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button size="small" type="primary" icon="el-icon-search" @click="search">搜索</el-button>
-        <el-button size="small" type="primary" icon="el-icon-refresh" @click="refresh">重置</el-button>
+        <el-badge :value="$store.state.newApplyNum - $store.state.oldApplyNum" :max="99" class="item" :hidden="$store.state.newApplyNum - $store.state.oldApplyNum <= 0">
+          <el-button size="small" type="primary" icon="el-icon-search" @click="search">搜索</el-button>
+        </el-badge>
+        <el-button size="small" type="primary" icon="el-icon-refresh" @click="refresh" style="margin-left: 20px;">重置</el-button>
       </el-form-item>
     </el-form>
     <!--列表-->
@@ -229,6 +231,7 @@ export default {
             this.pageparm.pageSize = this.formInline.pageSize
             this.pageparm.total = res.data.totalNum
             this.loading = false
+            this.$store.commit('setOldApplyNum',res.data.totalNum)
           }
         })
         .catch(err => {

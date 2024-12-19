@@ -17,7 +17,10 @@
         <el-menu-item-group>
           <el-menu-item v-for="chmenu in menu.menus" :index="'/' + chmenu.url" :key="chmenu.menuid">
             <!-- <i class="iconfont" :class="chmenu.icon"></i> -->
-            <span>{{ chmenu.menuname }}</span>
+            <span v-if="chmenu.menuid != 61">{{ chmenu.menuname }}</span>
+            <el-badge v-else :value="$store.state.newApplyNum - $store.state.oldApplyNum" :max="99" class="leftItem" :hidden="$store.state.newApplyNum - $store.state.oldApplyNum <= 0">
+              <span>{{ chmenu.menuname }}</span>
+            </el-badge>
           </el-menu-item>
         </el-menu-item-group>
 
@@ -25,7 +28,13 @@
       <div v-else>
         <el-menu-item :index="'/' + menu.url" :key="menu.menuid" >
           <i class="iconfont" :class="menu.icon"></i>
-          <span v-if="!collapsed">{{ menu.menuname }}</span>
+          <span v-if="!collapsed && menu.menuid != 3 && menu.menuid != 4">{{ menu.menuname }}</span>
+          <el-badge v-else-if="!collapsed && menu.menuid == 3" :value="$store.state.newVipNum - $store.state.oldVipNum" :max="99" class="leftItem" :hidden="$store.state.newVipNum - $store.state.oldVipNum <= 0">
+            <span v-if="!collapsed">{{ menu.menuname }}</span>
+          </el-badge>
+          <el-badge v-else-if="!collapsed && menu.menuid == 4" :value="$store.state.newOrderNum - $store.state.oldOrderNum" :max="99" class="leftItem" :hidden="$store.state.newOrderNum - $store.state.oldOrderNum <= 0">
+            <span v-if="!collapsed">{{ menu.menuname }}</span>
+          </el-badge>
         </el-menu-item>
       </div>
     </div>
@@ -230,7 +239,7 @@ export default {
   }
 }
 </script>
-<style>
+<style >
 .el-menu-vertical-demo:not(.el-menu--collapse) {
   width: 240px;
   min-height: 400px;
@@ -264,5 +273,9 @@ export default {
 
 .logoimg {
   height: 40px;
+}
+.leftItem .el-badge__content.is-fixed {
+  top: 12px;
+  right: 3px;
 }
 </style>

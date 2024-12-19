@@ -17,6 +17,7 @@
 // 导入组件
 import navcon from '../components/navcon.vue'
 import leftnav from '../components/leftnav.vue'
+import { getOrderList, getVipList, getApplyList } from "../api/api"
 export default {
   name: 'index',
   data() {
@@ -30,8 +31,41 @@ export default {
     navcon,
     leftnav
   },
-  methods: {},
+
+  methods: {
+    //轮询检查VIP管理，订单管理，提现申请是否有新数据
+    updateNum() {
+      getOrderList({
+        pageNo: 1,
+        pageSize: 10,
+      }).then(res => {
+        if(res.code == 200){
+          this.$store.commit('setOrderNum',res.data.totalNum)
+        }
+      })
+      getVipList({
+        pageNo: 1,
+        pageSize: 10,
+      }).then(res => {
+        if(res.code == 200){
+          this.$store.commit('setVipNum',res.data.totalNum)
+        }
+      })
+      getApplyList({
+        pageNo: 1,
+        pageSize: 10,
+      }).then(res => {
+        if(res.code == 200){
+          this.$store.commit('setApplyNum',res.data.totalNum)
+        }
+      })
+    }
+  },
   created() {
+    this.updateNum()
+      let timer = setInterval(() => {
+        this.updateNum()
+      }, 600000);
     // 监听
     this.$root.Bus.$on('toggle', value => {
       if (value) {

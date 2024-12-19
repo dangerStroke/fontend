@@ -30,8 +30,11 @@
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button size="small" type="primary" icon="el-icon-search" @click="search">搜索</el-button>
-        <el-button size="small" type="primary" icon="el-icon-refresh" @click="refresh">重置</el-button>
+        <el-badge :value="$store.state.newOrderNum - $store.state.oldOrderNum" :max="99" class="item" :hidden="$store.state.newOrderNum - $store.state.oldOrderNum <= 0">
+          <el-button size="small" type="primary" icon="el-icon-search" @click="search">搜索</el-button>
+        </el-badge>
+        
+        <el-button size="small" type="primary" icon="el-icon-refresh" @click="refresh" style="margin-left: 20px;">重置</el-button>
         <!-- <el-button size="small" type="primary" icon="el-icon-plus" @click="handleEdit()">添加</el-button> -->
       </el-form-item>
     </el-form>
@@ -196,6 +199,7 @@ export default {
             this.pageparm.pageSize = this.formInline.pageSize
             this.pageparm.total = res.data.totalNum
             this.loading = false
+            this.$store.commit('setOldOrderNum',res.data.totalNum)
           }
         })
         .catch(err => {
@@ -247,7 +251,7 @@ export default {
     submitForm(editData) {
       this.$refs[editData].validate(valid => {
         if (valid) {
-          if(this.editForm.result != 'CANCEL') {
+          if(this.editForm.result == 'SUCCESS' || this.editForm.result == 'FAIL') {
             updateOrderState(this.editForm)
             .then(res => {
               this.editFormVisible = false
