@@ -33,7 +33,7 @@
       </el-form-item>
     </el-form>
     <!--列表-->
-    <el-table size="small" :data="listData" highlight-current-row v-loading="loading" border element-loading-text="拼命加载中" style="width: 100%;" :row-class-name="tableRowClassName">
+    <el-table ref="myTable" size="small" :data="listData" highlight-current-row v-loading="loading" border element-loading-text="拼命加载中" style="width: 100%;" :row-class-name="tableRowClassName">
       <el-table-column align="center" type="selection" width="60">
       </el-table-column>
       <el-table-column align="center" prop="id" label="ID" width="200">
@@ -344,7 +344,8 @@ export default {
     handleActive: function(index, row) {
       //启用
       if(row.status == -1) {
-        if(!row.roleCode) {
+        console.log(row)
+        if(row.ruleCode == '') {
           this.$message.error('请先编辑用户权限')
           return
         }

@@ -60,7 +60,7 @@
       </el-table-column>
       <el-table-column align="center" prop="createUser" label="创建人" width="100">
       </el-table-column>
-      <el-table-column align="center" prop="comboDescr" label="套餐描述" width="100">
+      <el-table-column align="center" prop="comboDescr" label="套餐描述" width="400">
       </el-table-column>
       <el-table-column align="center" prop="sellingPoint" label="套餐买点" width="100">
       </el-table-column>

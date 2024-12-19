@@ -250,6 +250,7 @@ export default {
       this.detailformInline.shareUserId = row.shareUserId
       this.title = row.username+'的分销详情'
       this.editFormVisible = true
+      this.detailformInline.shareUserId = row.id
       this.getdetaildata(this.detailformInline)
     },
     // 搜索事件

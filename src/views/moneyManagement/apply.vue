@@ -43,6 +43,8 @@
       </el-table-column>
       <el-table-column align="center" prop="phone" label="联系人电话" width="120">
       </el-table-column>
+      <el-table-column align="center"  prop="alipayAccount" label="提现金额" width="120">
+      </el-table-column>
       <el-table-column align="center"  prop="alipayAccount" label="提现支付宝账户" width="120">
       </el-table-column>
       <el-table-column align="center"  prop="alipayUsername" label="提现支付宝名称" width="150">
@@ -272,7 +274,7 @@ export default {
     submitForm(editData) {
       this.$refs[editData].validate(valid => {
         if (valid) {
-          if(editData.type == 1) {
+          if(this.editForm.type == 1) {
             applyApprove(this.editForm)
             .then(res => {
               this.editFormVisible = false
