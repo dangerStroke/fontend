@@ -63,9 +63,10 @@
       </el-table-column>
       <el-table-column align="center" label="操作" min-width="200" fixed="right">
         <template slot-scope="scope">
-          <el-button size="mini" type="primary" @click="handleEdit(scope.$index, scope.row, 1)" v-if="scope.row.orderState == 0">同意</el-button>
-          <el-button size="mini"  type="danger" @click="handleEdit(scope.$index, scope.row, 0)" v-if="scope.row.orderState == 0">拒绝</el-button>
-          <el-button size="mini"  @click="handleEdit(scope.$index, scope.row, 0)" v-if="scope.row.orderState == 1 || scope.row.orderState == -1">撤销</el-button>
+          <el-button size="mini" type="primary" @click="handleEdit(scope.$index, scope.row, -1)" v-if="scope.row.orderState == 0">接单</el-button>
+          <el-button size="mini" type="primary" @click="handleEdit(scope.$index, scope.row, 1)" v-if="scope.row.orderState == 2">同意</el-button>
+          <el-button size="mini"  type="danger" @click="handleEdit(scope.$index, scope.row, 0)" v-if="scope.row.orderState == 2">拒绝</el-button>
+          <el-button size="mini"  @click="handleEdit(scope.$index, scope.row, 2)" v-if="scope.row.orderState == 1 || scope.row.orderState == -1">撤销</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -87,7 +88,7 @@
 </template>
 
 <script>
-import { getOrderList, updateOrderState} from "../../api/api"
+import { getOrderList, updateOrderState,orderReset,orderApprove} from "../../api/api"
 import Pagination from '../../components/Pagination'
 export default {
   data() {
@@ -167,7 +168,7 @@ export default {
           return 'fail-row';
         } else if (row.orderState === 1) {
           return 'success-row';
-        } else if(row.status === 0) {
+        } else if(row.orderState === 2) {
           return 'warning-row';
         }
         return '';
@@ -228,17 +229,26 @@ export default {
         this.title = '请填写同意后的备注'
         this.editForm.id = row.id
         this.editForm.result='SUCCESS'
-      }else{
+      }else if(type == 0){
         this.title = '请填写拒绝后的备注'
         this.editForm.id = row.id
         this.editForm.result='FAIL'
+      }else if(type == 2) {
+        this.title = '请填写回退后的备注'
+        this.editForm.id = row.id
+        this.editForm.result='CANCEL'
+      }else if(type == -1) {
+        this.title = '请填写接单后的备注'
+        this.editForm.id = row.id
+        this.editForm.result='APPROVE'
       }
     },
     // 编辑、增加页面保存方法
     submitForm(editData) {
       this.$refs[editData].validate(valid => {
         if (valid) {
-          updateOrderState(this.editForm)
+          if(this.editForm.result != 'CANCEL') {
+            updateOrderState(this.editForm)
             .then(res => {
               this.editFormVisible = false
               this.loading = false
@@ -260,6 +270,53 @@ export default {
               this.loading = false
               this.$message.error('保存失败，请稍后再试！')
             })
+          }else if(this.editForm.result == "CANCEL"){
+            orderReset(this.editForm)
+            .then(res => {
+              this.editFormVisible = false
+              this.loading = false
+              if (res.success) {
+                this.getdata(this.formInline)
+                this.$message({
+                  type: 'success',
+                  message: '保存成功！'
+                })
+              } else {
+                this.$message({
+                  type: 'info',
+                  message: res.msg
+                })
+              }
+            })
+            .catch(err => {
+              this.editFormVisible = false
+              this.loading = false
+              this.$message.error('保存失败，请稍后再试！')
+            })
+          }else if(this.editForm.result == "APPROVE") {
+            orderApprove(this.editForm)
+            .then(res => {
+              this.editFormVisible = false
+              this.loading = false
+              if (res.success) {
+                this.getdata(this.formInline)
+                this.$message({
+                  type: 'success',
+                  message: '保存成功！'
+                })
+              } else {
+                this.$message({
+                  type: 'info',
+                  message: res.msg
+                })
+              }
+            })
+            .catch(err => {
+              this.editFormVisible = false
+              this.loading = false
+              this.$message.error('保存失败，请稍后再试！')
+            })
+          }
         } else {
           return false
         }

@@ -31,6 +31,10 @@ export const bannerUpdate = (params) => { return req("post", "/broadband/manage/
 export const getOrderList = (params) => { return req("post", "/broadband/manage/order/pageOrder", params) };
 //修改订单状态
 export const updateOrderState = (params) => { return req("post", "/broadband/manage/order/updateOrderState", params) };
+//订单回退
+export const orderReset = (params) => { return req("post", "/broadband/manage/order/cancel", params) };
+//订单接单
+export const orderApprove = (params) => { return req("post", "/broadband/manage/order/approve", params) };
 
 //获取VIP申请列表
 export const getVipList = (params) => { return req("post", "/broadband/manage/vip/page", params) };
