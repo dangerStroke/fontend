@@ -34,7 +34,7 @@ export const updateOrderState = (params) => { return req("post", "/broadband/man
 //订单回退
 export const orderReset = (params) => { return req("post", "/broadband/manage/order/cancel", params) };
 //订单接单
-export const orderApprove = (params) => { return req("post", "/broadband/manage/order/approve", params) };
+export const orderApprove = (params) => { return req("post", "/broadband/manage/order/receivingOrders", params) };
 
 //获取VIP申请列表
 export const getVipList = (params) => { return req("post", "/broadband/manage/vip/page", params) };
