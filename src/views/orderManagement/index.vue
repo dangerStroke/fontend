@@ -78,7 +78,7 @@
     <!-- 编辑界面 -->
     <el-dialog :title="title" :visible.sync="editFormVisible" width="30%" @close="closeDialog">
       <el-form label-width="120px" :model="editForm" :rules="rules" ref="editForm">
-        <el-form-item label="备注" prop="result">
+        <el-form-item label="备注" prop="orderComment">
           <el-input type="textarea" size="small" clearable v-model="editForm.orderComment" placeholder="请填写备注"></el-input>
         </el-form-item>
       </el-form>
@@ -124,7 +124,7 @@ export default {
       },
       // rules表单验证
       rules: {
-        result: [
+        orderComment: [
           { required: true, message: '请输入备注', trigger: 'blur' }
         ],
       },
