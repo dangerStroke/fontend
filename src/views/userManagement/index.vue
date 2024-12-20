@@ -88,17 +88,25 @@
       </el-table-column>
       <el-table-column align="center" sortable prop="createTime" label="创建时间" width="100">
       </el-table-column>
-      <el-table-column align="center" sortable prop="status" label="状态" width="100">
+      <el-table-column align="center" sortable prop="status" label="用户状态" width="100">
         <template slot-scope="scope">
           <span v-if="scope.row.status == -1">禁用</span>
           <span v-if="scope.row.status == 0">启用</span>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="操作" min-width="200" fixed="right">
+      <el-table-column align="center" sortable prop="distributionStatus" label="分销状态" width="100">
+        <template slot-scope="scope">
+          <span v-if="scope.row.distributionStatus == 0">禁用</span>
+          <span v-if="scope.row.distributionStatus == 1">启用</span>
+        </template>
+      </el-table-column>
+      <el-table-column align="center" label="操作" min-width="300" fixed="right">
         <template slot-scope="scope">
           <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
           <el-button size="mini" type="primary" @click="handleActive(scope.$index, scope.row )" v-if="scope.row.status == -1">启用</el-button>
           <el-button size="mini" type="warning" @click="handleActive(scope.$index, scope.row)" v-if="scope.row.status == 0">禁用</el-button>
+          <el-button size="mini" type="warning" @click="handleDistribution(scope.$index, scope.row)" v-if="scope.row.distributionStatus == 0">启用分销</el-button>
+          <el-button size="mini" type="warning" @click="handleDistribution(scope.$index, scope.row)" v-if="scope.row.distributionStatus == 1">禁用分销</el-button>
           <!-- <el-button size="mini" type="danger" @click="deleteUser(scope.$index, scope.row)">删除</el-button> -->
         </template>
       </el-table-column>
@@ -146,7 +154,7 @@
 </template>
 
 <script>
-import { getUserPage, userDisable, userEnable, userAdd, userUpdateVip, userInfoUpdate } from '../../api/api'
+import { getUserPage, userDisable, userEnable, userAdd, userUpdateVip, userInfoUpdate,userDistributionDisable,userDistributionEnable } from '../../api/api'
 import Pagination from '../../components/Pagination'
 export default {
   data() {
@@ -392,6 +400,29 @@ export default {
             this.$refs.myTable.doLayout();
           }
         })
+      }
+    },
+    //分销状态启用禁用
+    handleDistribution: function(index, row) {
+      //启用
+      console.log(row.distributionStatus)
+      if(row.distributionStatus == 1) {
+        userDistributionDisable({id:row.id}).then(res => {
+          if(res.code == 200) {
+            this.$message.success("禁用成功")
+            this.listData[index].distributionStatus = 0
+            this.$refs.myTable.doLayout();
+          }
+        })
+      }else{
+        userDistributionEnable({id:row.id}).then(res => {
+          if(res.code == 200) {
+            this.listData[index].distributionStatus = 1
+            this.$message.success("启用成功")
+            this.$refs.myTable.doLayout();
+          }
+        })
+       
       }
     },
     // 删除公司

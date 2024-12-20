@@ -31,6 +31,8 @@ import About from '@/views/operationManagement/about'
 import Notice from '@/views/operationManagement/notice'
 //收款账号管理
 import Payment from '@/views/operationManagement/payment'
+import MemberBenefits from '@/views/operationManagement/memberBenefits'
+import MinimumAmount from '@/views/operationManagement/minimumAmount'
 
 //提现申请
 import Apply from '@/views/moneyManagement/apply'
@@ -156,6 +158,20 @@ export default new Router({
             path: '/operationManagement/Payment',
             name: '收款账号管理',
             component: Payment,
+            meta: {
+                requireAuth: true
+            }
+        }, {
+            path: '/operationManagement/memberBenefits',
+            name: '关于会议权益',
+            component: MemberBenefits,
+            meta: {
+                requireAuth: true
+            }
+        }, {
+            path: '/operationManagement/minimumAmount',
+            name: '关于起提金额',
+            component: MinimumAmount,
             meta: {
                 requireAuth: true
             }

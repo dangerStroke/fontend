@@ -6,7 +6,7 @@
     <!-- 面包屑导航 -->
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-      <el-breadcrumb-item>订单管理</el-breadcrumb-item>
+      <el-breadcrumb-item>提现申请</el-breadcrumb-item>
     </el-breadcrumb>
     <!-- 搜索筛选 -->
     <el-form :inline="true" :model="formInline" class="user-search">
@@ -43,7 +43,7 @@
       </el-table-column>
       <el-table-column align="center" prop="phone" label="联系人电话" width="120">
       </el-table-column>
-      <el-table-column align="center"  prop="alipayAccount" label="提现金额" width="120">
+      <el-table-column align="center"  prop="amount" label="提现金额" width="120">
       </el-table-column>
       <el-table-column align="center"  prop="alipayAccount" label="提现支付宝账户" width="120">
       </el-table-column>

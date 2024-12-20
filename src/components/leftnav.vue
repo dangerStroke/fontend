@@ -156,6 +156,22 @@ export default {
               hasThird: 'N',
               url: 'operationManagement/payment',
               menus: null
+            },
+            {
+              menuid: 59,
+              icon: 'icon-cat-skuQuery',
+              menuname: '关于会议权益',
+              hasThird: 'N',
+              url: 'operationManagement/memberBenefits',
+              menus: null
+            },
+            {
+              menuid: 510,
+              icon: 'icon-cat-skuQuery',
+              menuname: '关于起提金额',
+              hasThird: 'N',
+              url: 'operationManagement/minimumAmount',
+              menus: null
             }
           ]
         },

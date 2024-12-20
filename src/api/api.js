@@ -55,6 +55,10 @@ export const userEnable = (params) => { return req("get", "/broadband/manage/cli
 export const userUpdateVip = (params) => { return req("post", "/broadband/manage/client/user/updateVipExpirationTime", params) };
 //修改客户端用户信息
 export const userInfoUpdate = (params) => { return req("post", "/broadband/manage/client/user/updateUserInfo", params) };
+//启用客户端客户的分销
+export const userDistributionEnable = (params) => { return req("get", "/broadband/manage/client/user/enableDistribution?id="+params.id, params) };
+//禁用客户端客户的分销
+export const userDistributionDisable = (params) => { return req("get", "/broadband/manage/client/user/disableDistribution?id="+params.id, params) };
 
 //获取供应商列表
 export const getSupplierList = (params) => { return req("post", "/broadband/manage/supplier/page", params) };
@@ -97,6 +101,16 @@ export const updateNotice = (params) => { return req("POST", "/broadband/manage/
 export const getPayment = (params) => { return req("GET", "/broadband/manage/company/aboutPayment", params) };
 //修改收款账户
 export const updatePayment = (params) => { return req("POST", "/broadband/manage/company/updatePayment", params) };
+
+//获取会议权益
+export const getMemberBenefits = (params) => { return req("GET", "/broadband/manage/company/aboutMemberBenefits", params) };
+//修改会议权益
+export const updateMemberBenefits = (params) => { return req("POST", "/broadband/manage/company/updateMemberBenefits", params) };
+
+//获取起提金额
+export const getMinimumAmount = (params) => { return req("GET", "/broadband/manage/company/aboutMinimumAmount", params) };
+//修改起提金额
+export const updateMinimumAmount = (params) => { return req("POST", "/broadband/manage/company/updateMinimumAmount", params) };
 
 //获取数据分析
 export const getAnalysisCount = () => { return req("GET", "/broadband/manage/analysis/count") };

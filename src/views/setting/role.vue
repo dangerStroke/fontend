@@ -167,17 +167,7 @@ export default {
               menuname: '轮播图管理',
               hasThird: 'N',
               url: 'operationManagement/swiper',
-              menus: [
-                {
-                  parentId:51,
-                  menuid: 511,
-                  icon: 'el-icon-picture',
-                  menuname: '轮播图管理1',
-                  hasThird: 'N',
-                  url: 'operationManagement/swiper',
-                  menus:null
-                }
-              ]
+              menus: null
             },
             {
               parentId:5,
@@ -239,6 +229,24 @@ export default {
               menuname: '收款账号管理',
               hasThird: 'N',
               url: 'operationManagement/payment',
+              menus: null
+            },
+            {
+              parentId:5,
+              menuid: 59,
+              icon: '',
+              menuname: '关于会议权益',
+              hasThird: 'N',
+              url: 'operationManagement/memberBenefits',
+              menus: null
+            },
+            {
+              parentId:5,
+              menuid: 510,
+              icon: '',
+              menuname: '关于起提金额',
+              hasThird: 'N',
+              url: 'operationManagement/minimumAmount',
               menus: null
             }
           ]
