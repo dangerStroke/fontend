@@ -58,7 +58,7 @@
       </el-table-column>
       <el-table-column align="center" prop="orderUsername" label="下单人" width="80">
       </el-table-column>
-      <el-table-column align="center" prop="" label="下单人手机号" width="120">
+      <el-table-column align="center" prop="orderPhone" label="下单人手机号" width="120">
       </el-table-column>
       <el-table-column align="center" prop="createTime" label="创建时间" width="200">
       </el-table-column>

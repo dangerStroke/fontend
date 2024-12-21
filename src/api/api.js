@@ -59,6 +59,8 @@ export const userInfoUpdate = (params) => { return req("post", "/broadband/manag
 export const userDistributionEnable = (params) => { return req("get", "/broadband/manage/client/user/enableDistribution?id="+params.id, params) };
 //禁用客户端客户的分销
 export const userDistributionDisable = (params) => { return req("get", "/broadband/manage/client/user/disableDistribution?id="+params.id, params) };
+//刷新客户端客户分享码
+export const refreshShareQrCode = (params) => { return req("post", "/broadband/manage/client/user/refreshShareQrCode", params) };
 
 //获取供应商列表
 export const getSupplierList = (params) => { return req("post", "/broadband/manage/supplier/page", params) };

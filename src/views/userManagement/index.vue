@@ -60,6 +60,15 @@
           </el-image>
         </template>
       </el-table-column>
+      <el-table-column align="center" prop="shareQrCode" label="用户分享码" width="100">
+        <template slot-scope="scope">
+          <el-image 
+            style="width: 60px; height: 60px"
+            :src="imgUrl + scope.row.shareQrCode"
+            :preview-src-list="[imgUrl + scope.row.shareQrCode]">
+          </el-image>
+        </template>
+      </el-table-column>
       <el-table-column  prop="phone" label="用户手机号" width="100">
       </el-table-column>
       <el-table-column  prop="vipFlag" label="是否是VIP" width="100">
@@ -100,13 +109,14 @@
           <span v-if="scope.row.distributionStatus == 1">启用</span>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="操作" min-width="300" fixed="right">
+      <el-table-column align="center" label="操作" min-width="400" fixed="right">
         <template slot-scope="scope">
           <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
           <el-button size="mini" type="primary" @click="handleActive(scope.$index, scope.row )" v-if="scope.row.status == -1">启用</el-button>
           <el-button size="mini" type="warning" @click="handleActive(scope.$index, scope.row)" v-if="scope.row.status == 0">禁用</el-button>
-          <el-button size="mini" type="warning" @click="handleDistribution(scope.$index, scope.row)" v-if="scope.row.distributionStatus == 0">启用分销</el-button>
+          <el-button size="mini" type="primary" @click="handleDistribution(scope.$index, scope.row)" v-if="scope.row.distributionStatus == 0">启用分销</el-button>
           <el-button size="mini" type="warning" @click="handleDistribution(scope.$index, scope.row)" v-if="scope.row.distributionStatus == 1">禁用分销</el-button>
+          <el-button size="mini" @click="refreshCode(scope.$index, scope.row)">刷新用户分享码</el-button>
           <!-- <el-button size="mini" type="danger" @click="deleteUser(scope.$index, scope.row)">删除</el-button> -->
         </template>
       </el-table-column>
@@ -154,7 +164,7 @@
 </template>
 
 <script>
-import { getUserPage, userDisable, userEnable, userAdd, userUpdateVip, userInfoUpdate,userDistributionDisable,userDistributionEnable } from '../../api/api'
+import { getUserPage, userDisable, userEnable, userAdd, userUpdateVip, userInfoUpdate,userDistributionDisable,userDistributionEnable,refreshShareQrCode } from '../../api/api'
 import Pagination from '../../components/Pagination'
 export default {
   data() {
@@ -402,6 +412,15 @@ export default {
         })
       }
     },
+    refreshCode(index,row) {
+      refreshShareQrCode({userId:row.id}).then(res => {
+          if(res.code == 200) {
+            this.$message.success("刷新成功")
+            // this.listData[index].distributionStatus = 0
+            // this.$refs.myTable.doLayout();
+          }
+        })
+    },  
     //分销状态启用禁用
     handleDistribution: function(index, row) {
       //启用
