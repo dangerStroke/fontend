@@ -415,9 +415,9 @@ export default {
     refreshCode(index,row) {
       refreshShareQrCode({userId:row.id}).then(res => {
           if(res.code == 200) {
+            this.listData[index].shareQrCode = res.data.shareQrCode
+            this.$refs.myTable.doLayout();
             this.$message.success("刷新成功")
-            // this.listData[index].distributionStatus = 0
-            // this.$refs.myTable.doLayout();
           }
         })
     },  
