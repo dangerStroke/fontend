@@ -69,11 +69,13 @@
           </el-image>
         </template>
       </el-table-column>
-      <el-table-column  prop="phone" label="用户手机号" width="100">
+      <el-table-column align="center"  prop="invitationCode" label="用户邀请码" width="100">
       </el-table-column>
-      <el-table-column  prop="vipFlag" label="是否是VIP" width="100">
+      <el-table-column align="center"  prop="phone" label="用户手机号" width="100">
       </el-table-column>
-      <el-table-column  prop="vipExpirationTime" label="会员到期时间" width="100">
+      <el-table-column align="center" prop="vipFlag" label="是否是VIP" width="100">
+      </el-table-column>
+      <el-table-column align="center" prop="vipExpirationTime" label="会员到期时间" width="100">
       </el-table-column>
       <el-table-column align="center" sortable prop="totalOrderNum" label="总订单数量" width="120">
       </el-table-column>
