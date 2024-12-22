@@ -104,9 +104,9 @@ export const getPayment = (params) => { return req("GET", "/broadband/manage/com
 //修改收款账户
 export const updatePayment = (params) => { return req("POST", "/broadband/manage/company/updatePayment", params) };
 
-//获取会议权益
+//获取会员权益
 export const getMemberBenefits = (params) => { return req("GET", "/broadband/manage/company/aboutMemberBenefits", params) };
-//修改会议权益
+//修改会员权益
 export const updateMemberBenefits = (params) => { return req("POST", "/broadband/manage/company/updateMemberBenefits", params) };
 
 //获取起提金额

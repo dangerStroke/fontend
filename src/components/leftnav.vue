@@ -160,7 +160,7 @@ export default {
             {
               menuid: 59,
               icon: 'icon-cat-skuQuery',
-              menuname: '关于会议权益',
+              menuname: '关于会员权益',
               hasThird: 'N',
               url: 'operationManagement/memberBenefits',
               menus: null

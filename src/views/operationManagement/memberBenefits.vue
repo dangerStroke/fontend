@@ -6,12 +6,14 @@
     <!-- 面包屑导航 -->
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-      <el-breadcrumb-item>会议权益</el-breadcrumb-item>
+      <el-breadcrumb-item>会员权益</el-breadcrumb-item>
     </el-breadcrumb>
     <!-- 搜索筛选 -->
     <!--列表-->
     <el-table size="small" :data="listData" highlight-current-row v-loading="loading" border element-loading-text="拼命加载中" style="width: 100%;margin-top: 30px;">
-      <el-table-column align="center" prop="memberBenefits" label="会议权益" width="300">
+      <el-table-column align="center" prop="memberBenefits" label="会员权益" width="300">
+      </el-table-column>
+      <el-table-column align="center" prop="vipPrice" label="会员金额" width="300">
       </el-table-column>
       <el-table-column align="center" label="操作" min-width="300" fixed="right">
         <template slot-scope="scope">
@@ -24,8 +26,11 @@
     <!-- 编辑界面 -->
     <el-dialog :title="title" :visible.sync="editFormVisible" width="30%" @close="closeDialog">
       <el-form label-width="120px" :model="editForm" :rules="rules" ref="editForm">
-        <el-form-item label="会议权益" prop="memberBenefits">
+        <el-form-item label="会员权益" prop="memberBenefits">
           <el-input size="small" v-model="editForm.memberBenefits" auto-complete="off" placeholder="请输入公告描述"></el-input>
+        </el-form-item>
+        <el-form-item label="会员金额" prop="vipPrice">
+          <el-input size="small" v-model="editForm.vipPrice" auto-complete="off" placeholder="请输入公告描述"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -49,12 +54,16 @@ export default {
       title: '添加',
       editForm: {
         memberBenefits: '',
+        vipPrice:''
       },
       // rules表单验证
       rules: {
         memberBenefits: [
           { required: true, message: '请输入部门名称', trigger: 'blur' }
-        ]
+        ],
+        vipPrice: [
+          { required: true, message: '请输入部门名称', trigger: 'blur' }
+        ],
       },
       userparm: [], //搜索权限
       listData: [], //用户数据
@@ -96,7 +105,8 @@ export default {
         .then(res => {
           this.loading = false
           this.listData = [{
-            memberBenefits:res.data.memberBenefits
+            memberBenefits:res.data.memberBenefits,
+            vipPrice:res.data.vipPrice
           }]
         })
         .catch(err => {
@@ -112,6 +122,7 @@ export default {
     handleEdit: function(index, row) {
       this.editFormVisible = true
       this.editForm.memberBenefits = row.memberBenefits
+      this.editForm.vipPrice = row.vipPrice
     },
     // 编辑、增加页面保存方法
     submitForm(editData) {

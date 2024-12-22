@@ -46,7 +46,7 @@
       <el-table-column align="center" prop="statusName" label="状态" width="120">
         <template slot-scope="scope">
           <span v-if="scope.row.status == 1">启用</span>
-          <span v-if="scope.row.status == 0">禁用</span>
+          <span v-if="scope.row.status == -1">禁用</span>
         </template>
       </el-table-column>
       <el-table-column align="center" prop="createTime" label="创建时间" width="150">
@@ -54,7 +54,7 @@
       <el-table-column align="center" label="操作" min-width="200" fixed="right">
         <template slot-scope="scope">
           <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-          <el-button size="mini" type="primary" @click="handleActive(scope.$index, scope.row)" v-if="scope.row.status == 0">启用</el-button>
+          <el-button size="mini" type="primary" @click="handleActive(scope.$index, scope.row)" v-if="scope.row.status == -1">启用</el-button>
           <el-button size="mini" type="warning" @click="handleActive(scope.$index, scope.row)" v-if="scope.row.status == 1">禁用</el-button>
         </template>
       </el-table-column>
@@ -116,7 +116,7 @@ export default {
         phone: '',
         username:'',
         weChatQrCode:'',
-        status: 0,
+        status: -1,
       },
       statusOption:[
         {
@@ -124,7 +124,7 @@ export default {
           label:'启用'
         },
         {
-          value:0,
+          value:-1,
           label:'禁用'
         }
       ],
@@ -176,7 +176,7 @@ export default {
   methods: {
     tableRowClassName({row, rowIndex}) {
       
-        if (row.status === 0) {
+        if (row.status === -1) {
           return 'fail-row';
         } else if (row.status === 1) {
           return 'success-row';
@@ -243,16 +243,13 @@ export default {
         this.editForm.status = row.status
         
       } else {
-        if(row.status == 1) {
-          this.$message.info("只有草稿和禁用状态下可编辑")
-          return
-        }
         this.title = '添加客服'
         this.editForm.phone = ''
         this.editForm.username = ''
         this.editForm.weChatQrCode = ''
         this.editForm.id = ''
-        this.editForm.status = 0
+        this.editForm.status = -1
+        this.editFormVisible = true
       }
     },
     // 编辑、增加页面保存方法
@@ -357,7 +354,7 @@ export default {
     //启用禁用
     handleActive: function(index, row) {
       //启用
-      if(row.status == 0) {
+      if(row.status == -1) {
         waiterEnable({id:row.id}).then(res => {
           if(res.code == 200) {
             this.listData[index].status = 1
@@ -368,7 +365,7 @@ export default {
       }else{
         waiterDisable({id:row.id}).then(res => {
           if(res.code == 200) {
-            this.listData[index].status = 0
+            this.listData[index].status = -1
             this.$refs.myTable.doLayout();
             this.$message.success("禁用成功")
           }

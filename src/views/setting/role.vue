@@ -235,7 +235,7 @@ export default {
               parentId:5,
               menuid: 59,
               icon: '',
-              menuname: '关于会议权益',
+              menuname: '关于会员权益',
               hasThird: 'N',
               url: 'operationManagement/memberBenefits',
               menus: null

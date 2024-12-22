@@ -163,7 +163,7 @@ export default new Router({
             }
         }, {
             path: '/operationManagement/memberBenefits',
-            name: '关于会议权益',
+            name: '关于会员权益',
             component: MemberBenefits,
             meta: {
                 requireAuth: true
