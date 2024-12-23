@@ -115,6 +115,10 @@ export default {
         {
           value:0,
           label:'办理中'
+        },
+        {
+          value:2,
+          label:'已接单'
         }
       ],
       editForm: {
