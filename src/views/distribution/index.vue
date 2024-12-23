@@ -44,6 +44,8 @@
       </el-table-column>
       <el-table-column sortable align="center" prop="shareNum" label="分销团队人数" width="150">
       </el-table-column>
+      <el-table-column sortable align="center" prop="shareKickback" label="分佣收益" width="200">
+        </el-table-column>
       <el-table-column sortable align="center" prop="shareTotalOrderNum" label="分销团队总订单数" width="150">
       </el-table-column>
       <el-table-column sortable align="center" prop="shareSuccessOrderNum" label="分销团队成功订单数" width="180">
