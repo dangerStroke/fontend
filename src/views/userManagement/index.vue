@@ -85,7 +85,7 @@
       </el-table-column>
       <el-table-column align="center" sortable prop="totalRevenue" label="总收益" width="120">
       </el-table-column>
-      <el-table-column align="center" sortable prop="shareKickback" label="分佣收益" width="200">
+      <el-table-column align="center" sortable prop="shareKickback" label="分佣收益" width="120">
       </el-table-column>
       <el-table-column align="center" sortable prop="totalRevenue" label="账户余额" width="120">
       </el-table-column>
